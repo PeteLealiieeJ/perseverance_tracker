@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Vscode setting folder
+.vscode/
+
+# Emacs Temp Files
+*~
+
+

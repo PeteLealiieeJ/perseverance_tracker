@@ -20,7 +20,10 @@ import json
 # CONSTANTS
 ####################################################################################################
 ### SOURCE DATA URL
-DATA_SRC_URL = 'https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json'
+# ORGANIZED INDEXED BY APPROPRIATE SOL SPACING
+WAYPOINT_SRC_URL = 'https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json'
+# INTERMEDIATE TRAVERSAL DATA FOR MAP PLOTTING
+TRAVERSE_SRC_URL = 'https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_traverse.json'
 ### KUBE SERVICE IP
 REDIS_SERVICE_IP = ''
 ####################################################################################################
@@ -46,7 +49,7 @@ rd = redis.Redis(host=REDIS_SERVICE_IP, port=6379, db=4)
 # FLASK ROUTE FUNCTIONS 
 ####################################################################################################
 ### LOADS PRIMARY BODY OF FLASK APPLICATION
-@app.route('/data', methods=['POST'])
+@app.route('/load', methods=['POST'])
 def load_data():
     """                                                                                                                                                                                              
     Called to update the perseverance data sets used for services 
@@ -55,26 +58,33 @@ def load_data():
     returns:                                                                                                                                                                                         
         (str): Confirmation of Read                                                                                                                     
     """
-    pulled_data = requests.get(url=DATA_SRC_URL).json()['features']
-    for ii in range(len(pulled_data)):
-        set_str = f'dataset_{ii}'
-        rd.set( set_str, json.dumps(pulled_data[ii]) )
-    return f'Data has been loaded from the Source URL below: \n URL: {DATA_URL} \n'
+    pulled_way_data = requests.get(url=WAYPOINT_SRC_URL).json()['features']
+    for ii in range(len( pulled_way_data)):
+        set_str = f'way_dataset_{ii}'
+        rd.set( set_str, json.dumps( pulled_way_data[ii]) )
 
+    pulled_trav_data = requests.get(url=TRAVERSE_SRC_URL).json()['features']
+    for ii in range(len( pulled_trav_data)):
+        set_str = f'trav_dataset_{ii}'
+        rd.set( set_str, json.dumps( pulled_trav_data[ii]) )
 
-@app.route('/data', methods=['GET'])
+    return f'Data has been loaded from the Source URLs below: \n WAYPOINTS: {WAYPOINT_SRC_URL} \n TRAVERSAL: {TRAVERSE_SRC_URL} \n '
+
+###
+
+@app.route('/perseverance', methods=['GET'])
 def get_data():
     """                                                                                                                                                                                              
-    Called to display the perseverance data sets with optional start arg         
+    Called to display the perseverance waypoint data sets with optional start arg         
     args:
-        (none)                                                                                                                               
+        (opt) start: Start index for displaying data                                                                                                                               
     returns:                                                                                                                                                                                         
         (json): Jsonified display of perseverance data                                                                                                                       
     """
     perseverance_data = []
     # CHECK REDIS FOR KEYS
     if(len(rd.keys())==0):
-        return 'Please Load /data with POST route \n'
+        return 'Please use /load with POST route \n'
 
     # RUN THROUGH KEYS AND APPEND TO DATA LIST
     for ii in range(len(rd.keys())):
@@ -94,6 +104,40 @@ def get_data():
         return "Start index is greater than the number of data sets \n"
 
     return jsonify(perseverance_data[start:])
+
+###
+
+@app.route('/perseverance/orientation')
+# All orientation data
+
+@app.route('/perseverance/orientation/yaw')
+# Yaw as function of time plot
+
+@app.route('/perseverance/orientation/pitch')
+# Pitch as function of time plot
+
+@app.route('/perseverance/orientation/roll')
+# Roll as function of time plot
+
+@app.route('/perseverance/position')
+# All position data
+
+@app.route('/perseverance/position/longitude')
+# Longitude as function of time plot
+
+@app.route('/perseverance/position/latitude')
+# Latitude as function of time plot
+
+@app.route('/perseverance/position/map')
+# Latitude and Longitude of Rover on map
+
+@app.route('/perseverance/stats/distance')
+# returns total distance travelled from traverse src 
+
+@app.route('/perseverance/stats/duration')
+# returns current sol of mission
+
+
 ####################################################################################################
 
 

@@ -1,4 +1,4 @@
-from jobs import q,rd, update_job_status, get_job_by_id
+from jobs import q,rdj, update_job_status, get_job_by_id
 from time import sleep
 import matplotlib.pyplot as plt
 
@@ -22,7 +22,7 @@ def execute_ploting_job(jid):
         img = f.read()
 
     # PLACE THE IMAGE BYTES KEY ON THE JOB REQUEST ITSELF
-    rd.hset('job.{}'.format(jid), 'image', img)
+    rdj.hset('job.{}'.format(jid), 'image', img)
 
     update_job_status(jid, 'complete')
     return

@@ -15,7 +15,7 @@ import requests
 # JSON LIBRARIES
 import json
 # LOCAL 
-from jobs import rd
+from jobs import rdw,rdt,rdj
 import jobs 
 
 # CONSTANTS
@@ -38,7 +38,26 @@ app.config['JSON_SORT_KEYS'] = False
 
 # FILTERING AND INTERMEDIATE FUNCTIONS 
 ####################################################################################################
+def generate_way_key(id):
+  return 'way_dataset.{}'.format(id)
 
+def generate_trav_key(id):
+  return 'trav_dataset.{}'.format(id)
+
+
+def xyser_by_waykeys(xkey,ykey):
+    # RUN THROUGH KEYS AND APPEND TO DATA LIST
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
+    xset = []
+    yset = []
+    for ii in range(len(rdw.keys())):
+        element = rdw.get(generate_way_key(ii))
+        if not element is None:
+            xset.append(json.loads(element))['properties'][xkey]
+            yset.append(json.loads(element))['properties'][ykey]
+    xydict = {'xser': xset, 'yser': yset}
+    return xydict
 ####################################################################################################
 
 
@@ -66,7 +85,7 @@ app.config['JSON_SORT_KEYS'] = False
 def download(jid):
     path = f'/app/{jid}.png'
     with open(path, 'wb') as f:
-        f.write(rd.hget(jid, 'image'))
+        f.write(rdj.hget(jid, 'image'))
     return send_file(path, mimetype='image/png', as_attachment=True)
 
 
@@ -82,13 +101,11 @@ def load_data():
     """
     pulled_way_data = requests.get(url=WAYPOINT_SRC_URL).json()['features']
     for ii in range(len( pulled_way_data)):
-        set_str = f'way_dataset_{ii}'
-        rd.set( set_str, json.dumps( pulled_way_data[ii]) )
+        rdw.set( generate_way_key(ii), json.dumps( pulled_way_data[ii]) )
 
     pulled_trav_data = requests.get(url=TRAVERSE_SRC_URL).json()['features']
     for ii in range(len( pulled_trav_data)):
-        set_str = f'trav_dataset_{ii}'
-        rd.set( set_str, json.dumps( pulled_trav_data[ii]) )
+        rdt.set( generate_trav_key(ii), json.dumps( pulled_trav_data[ii]) )
 
     return f'Data has been loaded from the Source URLs below: \n WAYPOINTS: {WAYPOINT_SRC_URL} \n TRAVERSAL: {TRAVERSE_SRC_URL} \n '
 
@@ -105,13 +122,12 @@ def get_data():
     """
     perseverance_data = []
     # CHECK REDIS FOR KEYS
-    if(len(rd.keys())==0):
+    if(len(rdw.keys())==0):
         return 'Please use /load with POST route \n'
 
     # RUN THROUGH KEYS AND APPEND TO DATA LIST
-    for ii in range(len(rd.keys())):
-        set_str = f'dataset_{ii}'
-        v = rd.get(set_str)
+    for ii in range(len(rdw.keys())):
+        v = rdw.get(generate_way_key(ii))
         if not v is None:
             perseverance_data.append(json.loads(v))
 
@@ -122,56 +138,65 @@ def get_data():
             start = int(start)
         except ValueError:
             return "Invalid start parameter; start must be an integer \n"
-    if (start+1)>len(rd.keys()):
+    if (start+1)>len(rdw.keys()):
         return "Start index is greater than the number of data sets \n"
 
     return jsonify(perseverance_data[start:])
 
 ###
 
-@app.route('/perseverance/sol')
-# Most recent waypoints sol identifier
-# sting
+# @app.route('/perseverance/sol')
+# # Most recent waypoints sol identifier
+# # sting
 
-@app.route('/perseverance/orientation')
-# All orientation data
-# json
+# @app.route('/perseverance/orientation')
+# # All orientation data
+# # json
 
 @app.route('/perseverance/orientation/yaw')
-# Yaw as function of time plot
-# plot job
+def yaw_req():
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
 
-@app.route('/perseverance/orientation/pitch')
-# Pitch as function of time plot
-# plot job
+    serDataDict = xyser_by_waykeys('sol','yaw')
+    try:
+        # get start and end locations
+        job = request.get_json(force=True)
+    except Exception as e:
+        return True, json.dumps({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})
+    return json.dumps(jobs.add_job( str(serDataDict['xser']), str(serDataDict['yser']), job['start'], job['end']))
 
-@app.route('/perseverance/orientation/roll')
-# Roll as function of time plot
-# plot job
+# @app.route('/perseverance/orientation/pitch')
+# # Pitch as function of time plot
+# # plot job
 
-@app.route('/perseverance/position')
-# All position data
-# json
+# @app.route('/perseverance/orientation/roll')
+# # Roll as function of time plot
+# # plot job
 
-@app.route('/perseverance/position/longitude')
-# Longitude as function of time plot
-# job plot 
+# @app.route('/perseverance/position')
+# # All position data
+# # json
 
-@app.route('/perseverance/position/latitude')
-# Latitude as function of time plot
-# job plot
+# @app.route('/perseverance/position/longitude')
+# # Longitude as function of time plot
+# # job plot 
 
-@app.route('/perseverance/position/map')
-# Latitude and Longitude of Rover on map
-# job plot
+# @app.route('/perseverance/position/latitude')
+# # Latitude as function of time plot
+# # job plot
 
-@app.route('/perseverance/stats/distance')
-# returns total distance travelled from traverse src 
-# string
+# @app.route('/perseverance/position/map')
+# # Latitude and Longitude of Rover on map
+# # job plot
 
-@app.route('/perseverance/stats/duration')
-# returns current sol of mission
-# string
+# @app.route('/perseverance/stats/distance')
+# # returns total distance travelled from traverse src 
+# # string
+
+# @app.route('/perseverance/stats/duration')
+# # returns current sol of mission
+# # string
 
 
 ####################################################################################################

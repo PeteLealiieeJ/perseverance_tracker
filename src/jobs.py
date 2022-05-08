@@ -9,13 +9,17 @@ import uuid
 ####################################################################################################
 ### KUBE SERVICE IP
 REDIS_SERVICE_IP = ''
-DATA_REDIS_DB = 0
-QUEUE_REDIS_DB = 1
+WAYDATA_REDIS_DB = 0
+TRAVDATA_REDIS_DB = 1
+JOB_REDIS_DB = 2
+QUEUE_REDIS_DB = 3
 ####################################################################################################
 
 # LIBRARY CONFIGURATIONS
 ####################################################################################################
-rd = StrictRedis(host=REDIS_SERVICE_IP, port=6379, db=DATA_REDIS_DB)
+rdw = StrictRedis(host=REDIS_SERVICE_IP, port=6379, db=WAYDATA_REDIS_DB)
+rdt = StrictRedis(host=REDIS_SERVICE_IP, port=6379, db=TRAVDATA_REDIS_DB)
+rdj = StrictRedis(host=REDIS_SERVICE_IP, port=6379, db=JOB_REDIS_DB)
 q = HotQueue("queue", host=REDIS_SERVICE_IP, port=6379, db=QUEUE_REDIS_DB)
 ####################################################################################################
 
@@ -60,7 +64,7 @@ def instantiate_job(jid, xdatastr, ydatastr, status, start, end):
 
 def save_job(job_key, job_dict):
     """Save a job object in the Redis database."""
-    rd.hset(job_key, mapping=job_dict)
+    rdj.hset(job_key, mapping=job_dict)
 
 
 def queue_job(jid):
@@ -88,7 +92,7 @@ def decode_byte_dict(bdict):
 
 def get_job_by_id(jid):
     """Save a job object in the Redis database."""
-    return decode_byte_dict( rd.hgetall(generate_job_key(jid)) )
+    return decode_byte_dict( rdj.hgetall(generate_job_key(jid)) )
     
 
 def update_job_status(jid, status):

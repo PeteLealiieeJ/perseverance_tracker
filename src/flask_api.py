@@ -21,9 +21,9 @@ import jobs
 # CONSTANTS
 ####################################################################################################
 ### SOURCE DATA URL
-# ORGANIZED INDEXED BY APPROPRIATE SOL SPACING
+# ORGANIZED INDEXED BY APPROPRIATE SOL SPACING (SOL INDEXED)
 WAYPOINT_SRC_URL = 'https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json'
-# INTERMEDIATE TRAVERSAL DATA FOR MAP PLOTTING
+# INTERMEDIATE TRAVERSAL DATA FOR MAP PLOTTING (NOT SOL INDEXED)
 TRAVERSE_SRC_URL = 'https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_traverse.json'
 ####################################################################################################
 
@@ -54,8 +54,8 @@ def xyser_by_waykeys(xkey,ykey):
     for ii in range(len(rdw.keys())):
         element = rdw.get(generate_way_key(ii))
         if not element is None:
-            xset.append(json.loads(element))['properties'][xkey]
-            yset.append(json.loads(element))['properties'][ykey]
+            xset.append(json.loads(element)['properties'][xkey])
+            yset.append(json.loads(element)['properties'][ykey])
     xydict = {'xser': xset, 'yser': yset}
     return xydict
 ####################################################################################################
@@ -109,8 +109,8 @@ def load_data():
 
     return f'Data has been loaded from the Source URLs below: \n WAYPOINTS: {WAYPOINT_SRC_URL} \n TRAVERSAL: {TRAVERSE_SRC_URL} \n '
 
-###
 
+### RETURNS ALL RELEVANT WAYPOINT SOURCES DATA
 @app.route('/perseverance', methods=['GET'])
 def get_data():
     """                                                                                                                                                                                              
@@ -143,7 +143,8 @@ def get_data():
 
     return jsonify(perseverance_data[start:])
 
-###
+
+### PRIMARY DATA ROUTES ###
 
 # @app.route('/perseverance/sol')
 # # Most recent waypoints sol identifier
@@ -166,25 +167,41 @@ def yaw_req():
         return True, json.dumps({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})
     return json.dumps(jobs.add_job( str(serDataDict['xser']), str(serDataDict['yser']), job['start'], job['end']))
 
-# @app.route('/perseverance/orientation/pitch')
-# # Pitch as function of time plot
-# # plot job
 
-# @app.route('/perseverance/orientation/roll')
-# # Roll as function of time plot
-# # plot job
+### TEST FUNCTIONS WHICH REQUIRE ADDITIONAL WORK FOR FUNCTIONALITY
+
+@app.route('/perseverance/orientation/pitch')
+def pitch_req():
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
+    serDataDict = xyser_by_waykeys('sol','pitch')
+    return(jsonify(serDataDict))
+
+@app.route('/perseverance/orientation/roll')
+def roll_req():
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
+    serDataDict = xyser_by_waykeys('sol','roll')
+    return(jsonify(serDataDict))
 
 # @app.route('/perseverance/position')
 # # All position data
 # # json
 
-# @app.route('/perseverance/position/longitude')
-# # Longitude as function of time plot
-# # job plot 
+@app.route('/perseverance/position/longitude')
+def lat_req():
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
+    serDataDict = xyser_by_waykeys('sol','lon')
+    return(jsonify(serDataDict))
 
-# @app.route('/perseverance/position/latitude')
-# # Latitude as function of time plot
-# # job plot
+
+@app.route('/perseverance/position/latitude')
+def lat_req():
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
+    serDataDict = xyser_by_waykeys('sol','lat')
+    return(jsonify(serDataDict))
 
 # @app.route('/perseverance/position/map')
 # # Latitude and Longitude of Rover on map

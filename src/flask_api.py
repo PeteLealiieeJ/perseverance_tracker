@@ -9,13 +9,14 @@ RETURN FORMAT -> json holding a single element in the features list of the encom
 ####################################################################################################
 
 # FLASKS LIBRARIES
-from flask import Flask, request, jsonify
-# REDIS LIBRARIES
-import redis
+from flask import Flask, request, jsonify, send_file
 #LIBRARY USED TO PULL JSON FROM NASA SOURCE
 import requests 
 # JSON LIBRARIES
 import json
+# LOCAL 
+from jobs import rd
+import jobs 
 
 # CONSTANTS
 ####################################################################################################
@@ -24,8 +25,6 @@ import json
 WAYPOINT_SRC_URL = 'https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json'
 # INTERMEDIATE TRAVERSAL DATA FOR MAP PLOTTING
 TRAVERSE_SRC_URL = 'https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_traverse.json'
-### KUBE SERVICE IP
-REDIS_SERVICE_IP = ''
 ####################################################################################################
 
 
@@ -34,9 +33,6 @@ REDIS_SERVICE_IP = ''
 ### FLASK APPLICATION VARIABLES 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
-
-### REDIS DATABASE VARIABLES
-rd = redis.Redis(host=REDIS_SERVICE_IP, port=6379, db=4)
 ####################################################################################################
 
 
@@ -48,6 +44,32 @@ rd = redis.Redis(host=REDIS_SERVICE_IP, port=6379, db=4)
 
 # FLASK ROUTE FUNCTIONS 
 ####################################################################################################
+
+
+# @app.route('/jobs', methods=['POST'])
+# def jobs_api():
+#     """
+#     API route for creating a new job to do some analysis. This route accepts a JSON payload
+#     describing the job to be created.
+#     """
+#     timeser = []
+#     posser = []
+#     try:
+#         # get start and end locations
+#         job = request.get_json(force=True)
+#     except Exception as e:
+#         return True, json.dumps({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})
+#     return json.dumps(jobs.add_job( timeser, posser, job['start'], job['end']))
+
+
+@app.route('/download/<jid>', methods=['GET'])
+def download(jid):
+    path = f'/app/{jid}.png'
+    with open(path, 'wb') as f:
+        f.write(rd.hget(jid, 'image'))
+    return send_file(path, mimetype='image/png', as_attachment=True)
+
+
 ### LOADS PRIMARY BODY OF FLASK APPLICATION
 @app.route('/load', methods=['POST'])
 def load_data():
@@ -107,35 +129,49 @@ def get_data():
 
 ###
 
+@app.route('/perseverance/sol')
+# Most recent waypoints sol identifier
+# sting
+
 @app.route('/perseverance/orientation')
 # All orientation data
+# json
 
 @app.route('/perseverance/orientation/yaw')
 # Yaw as function of time plot
+# plot job
 
 @app.route('/perseverance/orientation/pitch')
 # Pitch as function of time plot
+# plot job
 
 @app.route('/perseverance/orientation/roll')
 # Roll as function of time plot
+# plot job
 
 @app.route('/perseverance/position')
 # All position data
+# json
 
 @app.route('/perseverance/position/longitude')
 # Longitude as function of time plot
+# job plot 
 
 @app.route('/perseverance/position/latitude')
 # Latitude as function of time plot
+# job plot
 
 @app.route('/perseverance/position/map')
 # Latitude and Longitude of Rover on map
+# job plot
 
 @app.route('/perseverance/stats/distance')
 # returns total distance travelled from traverse src 
+# string
 
 @app.route('/perseverance/stats/duration')
 # returns current sol of mission
+# string
 
 
 ####################################################################################################

@@ -1,12 +1,5 @@
 # STATUS: IN PROGRESS
 ####################################################################################################
-# IMPORTANT NOTES
-'''
-CURRENTLY DATA IS BEING STORED ON THE REDIS SERVER WITH THE FOLLOWING PARAMETERS:
-REDIS KEY STRING FORMAT -> dataset_{ii} [where {ii} is the index at which the list element was uploaded]
-RETURN FORMAT -> json holding a single element in the features list of the encompassing json (sol indexed datasets)
-'''
-####################################################################################################
 
 # FLASKS LIBRARIES
 from flask import Flask, request, jsonify, send_file
@@ -38,6 +31,32 @@ app.config['JSON_SORT_KEYS'] = False
 
 # FILTERING AND INTERMEDIATE FUNCTIONS 
 ####################################################################################################
+def ser_by_waykeys(key):
+    # RUN THROUGH KEYS AND APPEND TO DATA LIST
+    if(len(rdw.keys())==0):
+        return []
+    dset = []
+    for ii in range(len(rdw.keys())):
+        element = rdw.get(generate_way_key(ii))
+        if not element is None:
+            dset.append(json.loads(element)['properties'][key])
+    return dset
+
+
+def dlist_by_waykeys(keylist):
+    if(len(rdw.keys())==0):
+        return []
+    dictlist = []
+    for ii in range(len(rdw.keys())):
+        element = rdw.get(generate_way_key(ii))
+        if not element is None:
+            ddict = {}
+            for key in keylist:
+                ddict[key] = json.loads(element)['properties'][key]
+            dictlist.append(ddict)
+    return dictlist
+
+
 def generate_data_key(typei,xdatai,ydatai):
     return json.dumps({'type':typei,'xdata':xdatai,'ydata':ydatai})
 
@@ -50,20 +69,29 @@ def generate_plot_key(titlei,xlabeli,ylabeli):
 ####################################################################################################
 
 
-# @app.route('/jobs', methods=['POST'])
-# def jobs_api():
-#     """
-#     API route for creating a new job to do some analysis. This route accepts a JSON payload
-#     describing the job to be created.
-#     """
-#     timeser = []
-#     posser = []
-#     try:
-#         # get start and end locations
-#         job = request.get_json(force=True)
-#     except Exception as e:
-#         return True, json.dumps({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})
-#     return json.dumps(jobs.add_job( timeser, posser, job['start'], job['end']))
+@app.route('/jobs', methods=['POST'])
+def jobs_api():
+    """ 
+    MISCELLANEOUS JOBS FOR PLOTS KEYS VS OTHERS
+    """
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
+    try:
+        # GET START AND END LOCATIONS
+        req = request.get_json(force=True)
+    except Exception as e:
+        return jsonify({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})  
+    # ONE OF KEYS
+    xkey = req['xkey']
+    ykey = req['ykey']
+    # DBTYPE = WAY OR TRAV
+    dbtype = req['type']
+    title = f'Perseverance: Rover {ykey} v {xkey}'
+    retjid = jobs.add_job(  generate_data_key(dbtype,xkey,ykey), 
+                            generate_plot_key(title,xkey,ykey), 
+                            req['start'], 
+                            req['end'] ) 
+    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
 
 @app.route('/download/<jid>', methods=['GET'])
@@ -131,13 +159,16 @@ def get_data():
 
 ### PRIMARY DATA ROUTES ###
 
-# @app.route('/perseverance/sol')
-# # Most recent waypoints sol identifier
-# # sting
+@app.route('/perseverance/sol')
+def sol_req():
+    allSol = ser_by_waykeys('sol')
+    return f'Most recent data waypoint is at Sol-{max(allSol)}'
 
-# @app.route('/perseverance/orientation')
-# # All orientation data
-# # json
+
+@app.route('/perseverance/orientation')
+def orientation_req():
+    return jsonify( dlist_by_waykeys(['sol','yaw_rad','pitch','roll']) )
+
 
 @app.route('/perseverance/orientation/yaw', methods=['POST'])
 def yaw_req():
@@ -149,7 +180,7 @@ def yaw_req():
     except Exception as e:
         return jsonify({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})  
     retjid = jobs.add_job(  generate_data_key('way','sol','yaw_rad'), 
-                            generate_plot_key('Perseverance: Rover Yaw v Sol','Time [sol]','Yaw [rads]'), 
+                            generate_plot_key('Perseverance: Rover Yaw v Time','Time [sol]','Yaw [rads]'), 
                             req['start'], 
                             req['end'] ) 
     return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
@@ -159,26 +190,74 @@ def yaw_req():
 
 @app.route('/perseverance/orientation/pitch')
 def pitch_req():
-    return
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
+    try:
+        # GET START AND END LOCATIONS
+        req = request.get_json(force=True)
+    except Exception as e:
+        return jsonify({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})  
+    retjid = jobs.add_job(  generate_data_key('way','sol','pitch'), 
+                            generate_plot_key('Perseverance: Rover Pitch v Time','Time [sol]','Pitch [rads]'), 
+                            req['start'], 
+                            req['end'] ) 
+    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
+
 
 @app.route('/perseverance/orientation/roll')
 def roll_req():
-    return
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
+    try:
+        # GET START AND END LOCATIONS
+        req = request.get_json(force=True)
+    except Exception as e:
+        return jsonify({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})  
+    retjid = jobs.add_job(  generate_data_key('way','sol','roll'), 
+                            generate_plot_key('Perseverance: Rover Roll v Time','Time [sol]','Roll [rads]'), 
+                            req['start'], 
+                            req['end'] ) 
+    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
 
-# @app.route('/perseverance/position')
-# # All position data
-# # json
+@app.route('/perseverance/position')
+def orientation_req():
+    return jsonify( dlist_by_waykeys(['sol','lon','lat']) )
+
 
 @app.route('/perseverance/position/longitude')
 def lon_req():
-    return
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
+    try:
+        # GET START AND END LOCATIONS
+        req = request.get_json(force=True)
+    except Exception as e:
+        return jsonify({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})  
+    retjid = jobs.add_job(  generate_data_key('way','sol','lon'), 
+                            generate_plot_key('Perseverance: Rover Longitude v Time','Time [sol]','Longitude [deg]'), 
+                            req['start'], 
+                            req['end'] ) 
+    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
 
 @app.route('/perseverance/position/latitude')
 def lat_req():
-    return
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
+    try:
+        # GET START AND END LOCATIONS
+        req = request.get_json(force=True)
+    except Exception as e:
+        return jsonify({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})  
+    retjid = jobs.add_job(  generate_data_key('way','sol','lat'), 
+                            generate_plot_key('Perseverance: Rover Latitude v Time','Time [sol]','Latitude [deg]'), 
+                            req['start'], 
+                            req['end'] ) 
+    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
+
+### USES TRAVERSAL DATA 
 
 # @app.route('/perseverance/position/map')
 # # Latitude and Longitude of Rover on map
@@ -186,10 +265,6 @@ def lat_req():
 
 # @app.route('/perseverance/stats/distance')
 # # returns total distance travelled from traverse src 
-# # string
-
-# @app.route('/perseverance/stats/duration')
-# # returns current sol of mission
 # # string
 
 

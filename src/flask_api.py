@@ -44,6 +44,7 @@ def ser_by_waykeys(key):
 
 
 def dlist_by_waykeys(keylist):
+    # FILTERS KEYS OF SRC DATA
     if(len(rdw.keys())==0):
         return []
     dictlist = []
@@ -68,7 +69,7 @@ def generate_plot_key(titlei,xlabeli,ylabeli):
 # FLASK ROUTE FUNCTIONS 
 ####################################################################################################
 
-
+# ROUTE FOR REQUESTING PLOTTING JOB
 @app.route('/jobs', methods=['POST'])
 def jobs_api():
     """ 
@@ -93,7 +94,7 @@ def jobs_api():
                             req['end'] ) 
     return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
-
+# DOWNLOADING ROUTE
 @app.route('/download/<jid>', methods=['GET'])
 def download(jid):
     path = f'/app/{jid}.png'
@@ -157,7 +158,7 @@ def get_data():
     return jsonify(perseverance_data[start:])
 
 
-### PRIMARY DATA ROUTES ###
+### PRIMARY DATA ROUTES (USES WAYPOINT SRC URL) ###
 
 @app.route('/perseverance/sol')
 def sol_req():
@@ -185,8 +186,6 @@ def yaw_req():
                             req['end'] ) 
     return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
-
-### TEST FUNCTIONS WHICH REQUIRE ADDITIONAL WORK FOR FUNCTIONALITY
 
 @app.route('/perseverance/orientation/pitch')
 def pitch_req():
@@ -257,7 +256,7 @@ def lat_req():
     return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
 
-### USES TRAVERSAL DATA 
+### SECONDARY DATA ROUTES (USES TRAVERSE SRC URL) ###
 
 # @app.route('/perseverance/position/map')
 # # Latitude and Longitude of Rover on map

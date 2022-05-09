@@ -221,7 +221,7 @@ def roll_req():
 
 
 @app.route('/perseverance/position')
-def orientation_req():
+def position_req():
     return jsonify( dlist_by_waykeys(['sol','lon','lat']) )
 
 

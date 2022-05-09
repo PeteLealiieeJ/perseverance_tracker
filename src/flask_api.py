@@ -15,7 +15,7 @@ import requests
 # JSON LIBRARIES
 import json
 # LOCAL 
-from jobs import rdw,rdt,rdj, generate_trav_key, generate_way_key
+from jobs import rdw,rdt,rdj, generate_trav_key, generate_way_key, generate_job_key
 import jobs 
 
 # CONSTANTS
@@ -40,6 +40,9 @@ app.config['JSON_SORT_KEYS'] = False
 ####################################################################################################
 def generate_data_key(typei,xdatai,ydatai):
     return json.dumps({'type':typei,'xdata':xdatai,'ydata':ydatai})
+
+def generate_plot_key(titlei,xlabeli,ylabeli):
+    return json.dumps({'title':titlei,'xlabel':xlabeli,'ylabel':ylabeli})
 ####################################################################################################
 
 
@@ -144,8 +147,11 @@ def yaw_req():
         # GET START AND END LOCATIONS
         req = request.get_json(force=True)
     except Exception as e:
-        return True, json.dumps({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})  
-    retjid = jobs.add_job( generate_data_key('way','sol','yaw_rad'), req['start'], req['end'] ) 
+        return jsonify({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})  
+    retjid = jobs.add_job(  generate_data_key('way','sol','yaw_rad'), 
+                            generate_plot_key('Perseverance: Rover Yaw v Sol','Time [sol]','Yaw [rads]'), 
+                            req['start'], 
+                            req['end'] ) 
     return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
 
@@ -165,7 +171,7 @@ def roll_req():
 # # json
 
 @app.route('/perseverance/position/longitude')
-def lat_req():
+def lon_req():
     return
 
 

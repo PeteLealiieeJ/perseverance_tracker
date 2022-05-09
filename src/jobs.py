@@ -48,7 +48,7 @@ def generate_job_key(jid):
   return 'job.{}'.format(jid)
 
 
-def instantiate_job(jid, datakeys, status, start, end):
+def instantiate_job(jid, datakeys, pltopt, status, start, end):
     """
     Create the job object description as a python dictionary. Requires the job id, status,
     start and end parameters.
@@ -56,14 +56,14 @@ def instantiate_job(jid, datakeys, status, start, end):
     if type(jid) == str:
         return    {'id': jid,
                 'datakeys': datakeys, 
-                'pltopt': 'NEEDTO',
+                'pltopt': pltopt,
                 'status': status,
                 'start': start,
                 'end': end
                 }
     return    {'id': jid.decode('utf-8'),
             'datakeys': datakeys.decode('utf-8'),
-            'pltopt': 'NEEDTO',
+            'pltopt': pltopt.decode('utf-8'),
             'status': status.decode('utf-8'),
             'start': start.decode('utf-8'),
             'end': end.decode('utf-8')
@@ -80,10 +80,10 @@ def queue_job(jid):
     q.put(jid)
 
 
-def add_job(datakeys, start, end, status="submitted"):
+def add_job(datakeys, pltopt, start, end, status="submitted"):
     """Add a job to the redis queue."""
     jid = generate_jid()
-    job_dict = instantiate_job(jid, datakeys, status, start, end)
+    job_dict = instantiate_job(jid, datakeys, pltopt, status, start, end)
     save_job(generate_job_key(jid), job_dict)
     queue_job(jid)
     return jid
@@ -92,7 +92,8 @@ def add_job(datakeys, start, end, status="submitted"):
 def decode_byte_dict(bdict):
     ddict = {}
     for key in bdict.keys():
-        ddict[key.decode('utf-8')] = bdict[key].decode('utf-8')
+        if not key.decode('utf-8') == 'image':
+            ddict[key.decode('utf-8')] = bdict[key].decode('utf-8')
     return ddict
 
 

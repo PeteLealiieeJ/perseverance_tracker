@@ -15,7 +15,7 @@ import requests
 # JSON LIBRARIES
 import json
 # LOCAL 
-from jobs import rdw,rdt,rdj
+from jobs import rdw,rdt,rdj, generate_trav_key, generate_way_key
 import jobs 
 
 # CONSTANTS
@@ -38,26 +38,8 @@ app.config['JSON_SORT_KEYS'] = False
 
 # FILTERING AND INTERMEDIATE FUNCTIONS 
 ####################################################################################################
-def generate_way_key(id):
-  return 'way_dataset.{}'.format(id)
-
-def generate_trav_key(id):
-  return 'trav_dataset.{}'.format(id)
-
-
-def xyser_by_waykeys(xkey,ykey):
-    # RUN THROUGH KEYS AND APPEND TO DATA LIST
-    if(len(rdw.keys())==0):
-        return 'Please use /load with POST route \n'
-    xset = []
-    yset = []
-    for ii in range(len(rdw.keys())):
-        element = rdw.get(generate_way_key(ii))
-        if not element is None:
-            xset.append(json.loads(element)['properties'][xkey])
-            yset.append(json.loads(element)['properties'][ykey])
-    xydict = {'xser': xset, 'yser': yset}
-    return xydict
+def generate_data_key(typei,xdatai,ydatai):
+    return json.dumps({'type':typei,'xdata':xdatai,'ydata':ydatai})
 ####################################################################################################
 
 
@@ -85,7 +67,7 @@ def xyser_by_waykeys(xkey,ykey):
 def download(jid):
     path = f'/app/{jid}.png'
     with open(path, 'wb') as f:
-        f.write(rdj.hget(jid, 'image'))
+        f.write(rdj.hget(generate_job_key(jid), 'image'))
     return send_file(path, mimetype='image/png', as_attachment=True)
 
 
@@ -154,35 +136,29 @@ def get_data():
 # # All orientation data
 # # json
 
-@app.route('/perseverance/orientation/yaw')
+@app.route('/perseverance/orientation/yaw', methods=['POST'])
 def yaw_req():
     if(len(rdw.keys())==0):
         return 'Please use /load with POST route \n'
-
-    serDataDict = xyser_by_waykeys('sol','yaw')
     try:
-        # get start and end locations
-        job = request.get_json(force=True)
+        # GET START AND END LOCATIONS
+        req = request.get_json(force=True)
     except Exception as e:
-        return True, json.dumps({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})
-    return json.dumps(jobs.add_job( str(serDataDict['xser']), str(serDataDict['yser']), job['start'], job['end']))
+        return True, json.dumps({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})  
+    retjid = jobs.add_job( generate_data_key('way','sol','yaw_rad'), req['start'], req['end'] ) 
+    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
 
 ### TEST FUNCTIONS WHICH REQUIRE ADDITIONAL WORK FOR FUNCTIONALITY
 
 @app.route('/perseverance/orientation/pitch')
 def pitch_req():
-    if(len(rdw.keys())==0):
-        return 'Please use /load with POST route \n'
-    serDataDict = xyser_by_waykeys('sol','pitch')
-    return(jsonify(serDataDict))
+    return
 
 @app.route('/perseverance/orientation/roll')
 def roll_req():
-    if(len(rdw.keys())==0):
-        return 'Please use /load with POST route \n'
-    serDataDict = xyser_by_waykeys('sol','roll')
-    return(jsonify(serDataDict))
+    return
+
 
 # @app.route('/perseverance/position')
 # # All position data
@@ -190,18 +166,13 @@ def roll_req():
 
 @app.route('/perseverance/position/longitude')
 def lat_req():
-    if(len(rdw.keys())==0):
-        return 'Please use /load with POST route \n'
-    serDataDict = xyser_by_waykeys('sol','lon')
-    return(jsonify(serDataDict))
+    return
 
 
 @app.route('/perseverance/position/latitude')
 def lat_req():
-    if(len(rdw.keys())==0):
-        return 'Please use /load with POST route \n'
-    serDataDict = xyser_by_waykeys('sol','lat')
-    return(jsonify(serDataDict))
+    return
+
 
 # @app.route('/perseverance/position/map')
 # # Latitude and Longitude of Rover on map

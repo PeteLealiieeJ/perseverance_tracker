@@ -32,6 +32,14 @@ def generate_jid():
     return str(uuid.uuid4())
 
 
+def generate_way_key(id):
+  return 'way_dataset.{}'.format(id)
+
+
+def generate_trav_key(id):
+  return 'trav_dataset.{}'.format(id)
+
+
 def generate_job_key(jid):
   """
   Generate the redis key from the job id to be used when storing, retrieving or updating
@@ -40,22 +48,22 @@ def generate_job_key(jid):
   return 'job.{}'.format(jid)
 
 
-def instantiate_job(jid, xdatastr, ydatastr, status, start, end):
+def instantiate_job(jid, datakeys, status, start, end):
     """
     Create the job object description as a python dictionary. Requires the job id, status,
     start and end parameters.
     """
     if type(jid) == str:
         return    {'id': jid,
-                'xdata': xdatastr,
-                'ydata': ydatastr,
+                'datakeys': datakeys, 
+                'pltopt': 'NEEDTO',
                 'status': status,
                 'start': start,
                 'end': end
                 }
     return    {'id': jid.decode('utf-8'),
-            'xdata': xdatastr.decode('utf-8'),
-            'ydata': ydatastr.decode('utf-8'),
+            'datakeys': datakeys.decode('utf-8'),
+            'pltopt': 'NEEDTO',
             'status': status.decode('utf-8'),
             'start': start.decode('utf-8'),
             'end': end.decode('utf-8')
@@ -72,15 +80,13 @@ def queue_job(jid):
     q.put(jid)
 
 
-def add_job(xdata, ydata, start, end, status="submitted"):
+def add_job(datakeys, start, end, status="submitted"):
     """Add a job to the redis queue."""
     jid = generate_jid()
-    job_dict = instantiate_job(jid, str(xdata), str(ydata), status, start, end)
-    # update call to save_job:
+    job_dict = instantiate_job(jid, datakeys, status, start, end)
     save_job(generate_job_key(jid), job_dict)
-    # update call to queue_job:
     queue_job(jid)
-    return job_dict
+    return jid
 
 
 def decode_byte_dict(bdict):

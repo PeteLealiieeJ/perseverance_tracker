@@ -1,0 +1,26 @@
+version: '3'
+services:
+    redis:
+        image: redis:latest
+        container_name: petenick-redis
+        ports:
+            - 6415:6379
+        volumes:
+            - ./config/redis.conf:/redis.conf
+        command: [ "redis-server", "/redis.conf" ]
+
+    api:
+      build: 
+        context: ./
+        dockerfile: ./Dockerfile.api
+      container_name: petenick-web
+      ports:
+          - 5015:5000
+
+    wrk:
+      build: 
+        context: ./
+        dockerfile: ./Dockerfile.wrk
+      container_name: petenick-wrk
+
+      

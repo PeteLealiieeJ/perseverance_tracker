@@ -65,8 +65,8 @@ def execute_plotting_jobs(jid):
     plt.title(pltkeys['title']) 
     
     # SAVE IMAGE
-    plt.savefig('/output_image.png',format='png')
-    with open('/output_image.png', 'rb') as f:
+    plt.savefig('/app/output_image.png',format='png')
+    with open('/app/output_image.png', 'rb') as f:
         img = f.read()
     # PLACE THE IMAGE BYTES KEY ON THE JOB REQUEST ITSELF
     rdj.hset(generate_job_key(jid), 'image', img)

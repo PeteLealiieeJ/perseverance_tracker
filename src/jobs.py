@@ -8,7 +8,7 @@ import uuid
 # CONSTANTS
 ####################################################################################################
 ### KUBE SERVICE IP
-REDIS_SERVICE_IP = ''
+REDIS_SERVICE_IP = 'redis'
 WAYDATA_REDIS_DB = 0
 TRAVDATA_REDIS_DB = 1
 JOB_REDIS_DB = 2

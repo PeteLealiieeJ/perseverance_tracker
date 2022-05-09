@@ -1,8 +1,8 @@
-NSPACE="pete0100"
+NSPACE="petenick"
 APP="perseverance_tracker"
 VER="0.1"
-RPORT=""
-FPORT=""
+RPORT="6415"
+FPORT="5015"
 UID=""
 GID=""
 

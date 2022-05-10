@@ -35,7 +35,7 @@ run-db: build-db
                     -d \
                     -u ${UID}:${GID} \
                     -v ${PWD}/data/:/data \
-		    redis:latest \
+		    redis:6 \
                     --save 1 1
 
 run-api: build-api

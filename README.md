@@ -49,8 +49,28 @@ The Waypoint data is formatted as a json dictionary with a type and name identif
     }
 
 #
+# Requirements for Local Use and Testing 
+The following packages are required for direct use and are installed during container docker containerization (except for pytest which is only necessary for functionality testing)
+
+1. Flask 
+2. requests 
+3. redis 
+4. hotqueue 
+5. tornado
+6. matplotlib 
+7. pytest
+
+Each of the above python <package\> s can be installed locally with pip via
+
+    pip install <package>
+
+It is best that you install these packages they are listed to avoid unforeseen issues. (users should install tornado before matlibplot to avoid recent issues experienced with python3 dependencies) 
+
+#
 # Explanation of Functionality
 
+#
+# Integration Testing Application, Worker, Database
 
 
 #
@@ -211,6 +231,8 @@ After deploying the flask and redis servers via the instructions in the section 
 (i.e. for isp users)
 
     [python-debug#] curl <flask-service-CLUSTERIP>:5000/load -X POST
+
+The next section will go into more specifics on the routes available to users. 
 
 # Communicating with perseverance-tracker API
     curl localhost:5015/perseverance/orientation/yaw -X POST  -H 'Content-Type: application/json' -d '{"start":"0","end":"400"}'

@@ -16,7 +16,7 @@ list:
 
 
 build-db:
-	docker pull redis:6
+	docker pull redis:latest
 
 build-api:
 	docker build -t ${NSPACE}/${APP}-api:${VER} \
@@ -35,7 +35,8 @@ run-db: build-db
                     -d \
                     -u ${UID}:${GID} \
                     -v ${PWD}/data/:/data \
-                    redis:6 \
+                    -v ${PWD}/config/redis.conf:/redis.conf \
+		    redis:latest \
                     --save 1 1
 
 run-api: build-api

@@ -35,7 +35,6 @@ run-db: build-db
                     -d \
                     -u ${UID}:${GID} \
                     -v ${PWD}/data/:/data \
-                    -v ${PWD}/config/redis.conf:/redis.conf \
 		    redis:latest \
                     --save 1 1
 

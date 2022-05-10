@@ -133,3 +133,4 @@ dmypy.json
 
 # Emacs Temp Files
 *~
+.DS_Store

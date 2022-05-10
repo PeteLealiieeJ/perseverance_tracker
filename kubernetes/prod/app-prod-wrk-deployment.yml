@@ -19,8 +19,3 @@ spec:
         - name: app-prod-wrk
           imagePullPolicy: Always
           image: petenick/perseverance-tracker-wrk:VER
-          command: ['python', '-u', 'main.py']
-          env:
-          - <...>
-          ports:
-          - <...>

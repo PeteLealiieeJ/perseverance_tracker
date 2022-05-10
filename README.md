@@ -43,3 +43,7 @@ The data from the source URL is formatted ass seen below:
         …
         ]
     }
+
+# EXAMPLE USES 
+
+    curl localhost:5015/perseverance/orientation/yaw -X POST  -H 'Content-Type: application/json' -d '{"start":"0","end":"400"}'

@@ -2,30 +2,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-prod-api-deployment
+  name: ptracker-petenick-flask
   labels:
     username: petenick
-    env: perseverance
+    env: prod
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: app-prod-api
+      app: petenick-flask
   template:
     metadata:
       labels:
         username: petenick
-        env: perseverance
-        app: app-prod-api
+        env: prod
+        app: petenick-flask
     spec:
       containers:
-      - name: app-prod-api
-        image: petenick/perseverance-tracker-api:VER
+      - name: petenick-flask-container
         imagePullPolicy: Always
-        command: ['sh', '-c', 'python3 /code/app.py']
+        image: petelealiieej/perseverance-tracker-api:0.1
         env:
         - name: FLASK_APP
-          value: "/code/app.py"
+          value: "app.py"
         ports:
         - name: http
           containerPort: 5000

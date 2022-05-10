@@ -2,17 +2,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-prod-api-service
+  name: ptracker-petenick-flask-service
   labels:
     username: petenick
-    env: perseverance
+    env: prod
 spec:
   type: ClusterIP
   selector:
-    username: petenick
-    env: perseverance
-    app: app-prod-api
+    app: petenick-flask
   ports:
-  - name: app-prod-api-service
+  - name: petenick-flask
     port: 5000
     targetPort: 5000

@@ -62,6 +62,12 @@ clean-wrk:
 	docker stop ${NSPACE}-wrk && docker rm -f ${NSPACE}-wrk || true
 
 
+push-api: build-api
+    docker push ${NSPACE}/${APP}-api:${VER} 
+
+push-wrk: build-wrk
+    docker push ${NSPACE}/${APP}-wrk:${VER}
+
 
 build-all: build-db build-api build-wrk
 

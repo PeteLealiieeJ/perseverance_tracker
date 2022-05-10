@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ptracker-petenick-flask-test
+  labels:
+    username: petenick
+    env: test
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: petenick-flask-test
+  template:
+    metadata:
+      labels:
+        username: petenick
+        env: test
+        app: petenick-flask-test
+    spec:
+      containers:
+      - name: petenick-flask-test
+        imagePullPolicy: Always
+        image: petenick/perseverance-tracker-api:0.1
+        env:
+        - name: FLASK_APP
+          value: "flask_api.api"
+        ports:
+        - name: http
+          containerPort: 5000

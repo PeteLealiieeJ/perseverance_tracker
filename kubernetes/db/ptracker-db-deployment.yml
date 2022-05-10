@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ptracker-petenick-redis
+  labels:
+    username: petenick
+    env: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: petenick-redis
+  template:
+    metadata:
+      labels:
+        username: petenick
+        env: test
+        app: petenick-redis
+    spec:
+      containers:
+      - name: petenick-redis-container
+        image: redis:6
+        volumeMounts:
+        - name: ptracker-petenick-data
+          mountPath: "/data"
+      volumes:
+      - name: ptracker-petenick-data
+        persistentVolumeClaim:
+          claimName: ptracker-petenick-data

@@ -2,17 +2,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-prod-db-service
+  name: ptracker-petenick-redis-service
   labels:
     username: petenick
-    env: perseverance
+    env: test
 spec:
   type: ClusterIP
   selector:
-    username: petenick
-    env: perseverance
-    app: app-prod-db
+    app: petenick-redis
   ports:
-  - name: app-prod-db-service
+  - name: petenick-redis
     port: 6379
     targetPort: 6379

@@ -1,0 +1,22 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ptracker-petenick-wrk-test
+  labels:
+    app: petenick-wrk-test
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: petenick-wrk-test
+  template:
+    metadata:
+      labels:
+        username: petenick
+        app: petenick-wrk-test
+    spec:
+      containers:
+        - name: petenick-wrk-test
+          imagePullPolicy: Always
+          image: petenick/perseverance-tracker-wrk:0.1

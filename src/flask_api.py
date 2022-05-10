@@ -257,7 +257,7 @@ def lat_req():
 
 
 @app.route('/perseverance/position/map', methods=['POST'])
-def lat_req():
+def map_req():
     if(len(rdw.keys())==0):
         return 'Please use /load with POST route \n'
     try:

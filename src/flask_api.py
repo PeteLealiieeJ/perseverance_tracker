@@ -160,13 +160,13 @@ def get_data():
 
 ### PRIMARY DATA ROUTES (USES WAYPOINT SRC URL) ###
 
-@app.route('/perseverance/sol')
+@app.route('/perseverance/sol', methods=['GET'])
 def sol_req():
     allSol = ser_by_waykeys('sol')
     return f'Most recent data waypoint is at Sol-{max(allSol)}'
 
 
-@app.route('/perseverance/orientation')
+@app.route('/perseverance/orientation', methods=['GET'])
 def orientation_req():
     return jsonify( dlist_by_waykeys(['sol','yaw_rad','pitch','roll']) )
 
@@ -187,7 +187,7 @@ def yaw_req():
     return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
 
-@app.route('/perseverance/orientation/pitch')
+@app.route('/perseverance/orientation/pitch', methods=['POST'])
 def pitch_req():
     if(len(rdw.keys())==0):
         return 'Please use /load with POST route \n'
@@ -203,7 +203,7 @@ def pitch_req():
     return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
 
-@app.route('/perseverance/orientation/roll')
+@app.route('/perseverance/orientation/roll', methods=['POST'])
 def roll_req():
     if(len(rdw.keys())==0):
         return 'Please use /load with POST route \n'
@@ -219,12 +219,12 @@ def roll_req():
     return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
 
-@app.route('/perseverance/position')
+@app.route('/perseverance/position', methods=['GET'])
 def position_req():
     return jsonify( dlist_by_waykeys(['sol','lon','lat']) )
 
 
-@app.route('/perseverance/position/longitude')
+@app.route('/perseverance/position/longitude', methods=['POST'])
 def lon_req():
     if(len(rdw.keys())==0):
         return 'Please use /load with POST route \n'
@@ -240,7 +240,7 @@ def lon_req():
     return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
 
-@app.route('/perseverance/position/latitude')
+@app.route('/perseverance/position/latitude', methods=['POST'])
 def lat_req():
     if(len(rdw.keys())==0):
         return 'Please use /load with POST route \n'
@@ -256,12 +256,23 @@ def lat_req():
     return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
 
 
+@app.route('/perseverance/position/map', methods=['POST'])
+def lat_req():
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
+    try:
+        # GET START AND END LOCATIONS
+        req = request.get_json(force=True)
+    except Exception as e:
+        return jsonify({'status': "Error", 'message': 'Invalid JSON: {}.'.format(e)})  
+    retjid = jobs.add_job(  generate_data_key('way','lat','lon'), 
+                            generate_plot_key('Perseverance: Rover Longitude v Latitude','Latitude [deg]','Longitude [deg]'), 
+                            req['start'], 
+                            req['end'] ) 
+    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
+
+
 ### SECONDARY DATA ROUTES (USES TRAVERSE SRC URL) ###
-
-# @app.route('/perseverance/position/map')
-# # Latitude and Longitude of Rover on map
-# # job plot
-
 # @app.route('/perseverance/stats/distance')
 # # returns total distance travelled from traverse src 
 # # string

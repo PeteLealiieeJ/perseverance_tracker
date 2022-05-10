@@ -1,4 +1,4 @@
-NSPACE=petenick
+NSPACE=petelealiieej
 APP=perseverance-tracker
 VER=0.1
 RPORT=6415
@@ -62,11 +62,11 @@ clean-wrk:
 	docker stop ${NSPACE}-wrk && docker rm -f ${NSPACE}-wrk || true
 
 
-push-api: build-api
-    docker push ${NSPACE}/${APP}-api:${VER} 
+push-api: 
+	docker push ${NSPACE}/${APP}-api:${VER} 
 
-push-wrk: build-wrk
-    docker push ${NSPACE}/${APP}-wrk:${VER}
+push-wrk:
+	docker push ${NSPACE}/${APP}-wrk:${VER}
 
 
 build-all: build-db build-api build-wrk
@@ -75,5 +75,6 @@ run-all: run-db run-api run-wrk
 
 clean-all: clean-db clean-api clean-wrk
 
+push-all: push-api push-wrk
 
 all: clean-all build-all run-all 

@@ -9,8 +9,8 @@ import os
 
 # SERVICE IPS 
 ####################################################################################################
-REDIS_SERVICE_IP = str(os.environ.get('REDIS_IP', 'redis'))
-# REDIS_SERVICE_IP = ''
+#REDIS_SERVICE_IP = str(os.environ.get('REDIS_IP', 'redis'))
+REDIS_SERVICE_IP = '10.108.50.200'
 ####################################################################################################
 
 

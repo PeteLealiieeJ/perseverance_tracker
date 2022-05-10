@@ -21,7 +21,7 @@ spec:
       containers:
       - name: petenick-flask-test
         imagePullPolicy: Always
-        image: petenick/perseverance-tracker-api:0.1
+        image: petelealiieej/perseverance-tracker-api:0.1
         env:
         - name: FLASK_APP
           value: "flask_api.api"

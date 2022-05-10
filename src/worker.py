@@ -1,4 +1,4 @@
-from jobs import q,rdj,rdw, rdt, generate_way_key, generate_job_key, generate_trav_key, update_job_status, get_job_by_id
+from jobs import q,rdj,rdw, rdt, generate_way_key, generate_job_key, generate_trav_key, update_job_status, get_job_by_id, REDIS_SERVICE_IP
 from time import sleep
 import matplotlib.pyplot as plt
 import json
@@ -72,5 +72,5 @@ def execute_plotting_jobs(jid):
     rdj.hset(generate_job_key(jid), 'image', img)
     update_job_status(jid, 'complete')
     return
-
+print(REDIS_SERVICE_IP)
 execute_plotting_jobs()

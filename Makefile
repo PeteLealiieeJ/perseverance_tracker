@@ -1,5 +1,5 @@
 NSPACE=petenick
-APP=perseverance_tracker
+APP=perseverance-tracker
 VER=0.1
 RPORT=6415
 FPORT=5015

@@ -9,7 +9,7 @@ currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.append(f'{parentdir}/src')
 
-from jobs import generate_way_key, generate_job_key, generate_trav_key
+from jobs import generate_way_key, generate_trav_key
 
 FPORT = 5015
 BASEROUTE = f'http://localhost:{FPORT}'
@@ -45,5 +45,3 @@ def test_rdatabase_trav():
     assert isinstance( json.loads(rdt.get(generate_trav_key(0)))["geometry"]["coordinates"], list) == True    
     assert isinstance( json.loads(rdt.get(generate_trav_key(0)))["geometry"]["coordinates"][0][0], float) == True
 
-
-# ALL OTHER ROUTES ARE POST ROUTES FOR POST(ING) JOBS AND LOADERS

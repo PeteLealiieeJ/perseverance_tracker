@@ -16,7 +16,7 @@ list:
 
 
 build-db:
-	docker pull redis:latest
+	docker pull redis:6
 
 build-api:
 	docker build -t ${NSPACE}/${APP}-api:${VER} \

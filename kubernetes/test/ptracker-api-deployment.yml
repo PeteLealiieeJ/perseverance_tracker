@@ -19,12 +19,12 @@ spec:
         app: petenick-flask-test
     spec:
       containers:
-      - name: petenick-flask-test
+      - name: petenick-flask-container-test
         imagePullPolicy: Always
         image: petelealiieej/perseverance-tracker-api:0.1
         env:
         - name: FLASK_APP
-          value: "flask_api.api"
+          value: "app.py"
         ports:
         - name: http
           containerPort: 5000

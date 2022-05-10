@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-prod-api-service
+  labels:
+    username: petenick
+    env: perseverance
+spec:
+  type: ClusterIP
+  selector:
+    username: petenick
+    env: perseverance
+    app: app-prod-api
+  ports:
+  - name: app-prod-api-service
+    port: 5000
+    targetPort: 5000

@@ -46,8 +46,8 @@ def execute_plotting_jobs(jid):
         allData = xyser_by_waykeys(dkeys['xdata'], dkeys['ydata'])
     allX = allData['xser']
     allY = allData['yser']
-    start = int(job['start'])
-    end = int(job['end'])
+    start = float(job['start'])
+    end = float(job['end'])
 
     # NEEDS TO BE FIXED
     x_values_to_plot = []

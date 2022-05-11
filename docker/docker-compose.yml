@@ -12,7 +12,7 @@ services:
     api:
       build: 
         context: ../
-        dockerfile: ./Dockerfile.api
+        dockerfile: ./docker/Dockerfile.api
       container_name: petenick-web
       ports:
           - 5015:5000
@@ -20,7 +20,7 @@ services:
     wrk:
       build: 
         context: ../
-        dockerfile: ./Dockerfile.wrk
+        dockerfile: ./docker/Dockerfile.wrk
       container_name: petenick-wrk
 
       

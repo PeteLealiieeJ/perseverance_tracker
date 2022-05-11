@@ -91,6 +91,7 @@ def usage_info():
         ['Plotting Job Routes:', ''],
         ['/download/<jid>', '(GET) Get the Job Image from Routes Below'],        
         ['/jobs', '(POST) Post Job for Misc Plot'],
+        ['/jobs/list', '(GET) List all jobs and their status'],
         ['/perseverance/orientation/yaw', '(POST) Post job for "Yaw v Sol" Plot'],
         ['/perseverance/orientation/pitch', '(POST) Post job for "Pitch v Sol" Plot'],
         ['/perseverance/orientation/roll', '(POST) Post job for "Roll v Sol" Plot'],

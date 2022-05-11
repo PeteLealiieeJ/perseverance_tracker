@@ -8,7 +8,7 @@ import requests
 # JSON LIBRARIES
 import json
 # LOCAL 
-from jobs import rdw,rdt,rdj, generate_trav_key, generate_way_key, generate_job_key
+from jobs import rdw,rdt,rdj, generate_trav_key, generate_way_key, generate_job_key, decode_byte_dict
 import jobs 
 
 # CONSTANTS
@@ -144,6 +144,16 @@ def jobs_api():
                             req['start'], 
                             req['end'] ) 
     return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
+
+
+@app.route('/jobs/list', methods=['GET'])
+def jobs_list():
+    jobs_list = []
+    for key in list(rdj.keys()):
+        v = rdj.get(key)
+        if not v is None:
+            jobs_list.append(decode_byte_dict(v))
+    return jsonify(jobs_list)
 
 # DOWNLOADING ROUTE
 @app.route('/download/<jid>', methods=['GET'])

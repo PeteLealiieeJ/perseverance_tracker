@@ -75,6 +75,8 @@ The API, flask_api.py, itself is a python script which interacts with an assortm
 # Starting API with Docker Containers
 The functionality of this repository can be containerized with docker via the dockerfiles and docker-compose file located in the [docker folder](./docker/) of this repository. The simpliest method of creating and running the containers of this repository is to utilize the docker-compose file. We can start up the api, worker and redis server via the following command:
 
+**(As a note, before building, be sure, if not building for deployment to kubenetes, that the **REDIS_SERVICE_IP** variable in jobs.py is initilized with the os.enviorn.get()  on line 12 and that the lower redundant is commented out)**
+
     [P-Tracker/docker]$ docker-compose -p <namespace> up -d
 
 from here the IPAdress of the application server is usually the localhost. From this point you can access all routes on the 5015 port of the localhost. See all routes in the **Communicating with perseverance-tracker API** section at the bottom of this README. When finished, all of the images can be spun down with the following command:
@@ -132,6 +134,7 @@ NOTE: One must also update the FPORT, BASEROUTE, REDIS_TEST_IP and REDIS_TEST_PO
     #returns the redis ip address
 
 The IP address you get from the above command must then be copy and pasted into the test_db.py variable, **REDIS_TEST_IP** (line 19). It only needs to be changed here because this variable is imported to the other test files when necessary. Assumming that you've run the containers locally without altering the dockerfile, the FPORT, BASEROUTE, and REDIS_TEST_PORT should be the same. If running on a different port, be sure to change the **FPORT** variable on line 5 of **test_flask.py**.
+
 
 After that, one can run pytest with the following command in the test folder
 

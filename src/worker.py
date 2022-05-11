@@ -66,11 +66,13 @@ def execute_plotting_jobs(jid):
     
     # SAVE IMAGE
     plt.savefig('/app/output_image.png',format='png')
+    plt.clf()
     with open('/app/output_image.png', 'rb') as f:
         img = f.read()
     # PLACE THE IMAGE BYTES KEY ON THE JOB REQUEST ITSELF
     rdj.hset(generate_job_key(jid), 'image', img)
     update_job_status(jid, 'complete')
     return
+
 print(REDIS_SERVICE_IP)
 execute_plotting_jobs()

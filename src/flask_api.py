@@ -32,7 +32,9 @@ app.config['JSON_SORT_KEYS'] = False
 # FILTERING AND INTERMEDIATE FUNCTIONS 
 ####################################################################################################
 def ser_by_waykeys(key):
-    # RUN THROUGH KEYS AND APPEND TO DATA LIST
+    """
+    filters for a list of keys from source data
+    """
     if(len(rdw.keys())==0):
         return []
     dset = []
@@ -44,7 +46,9 @@ def ser_by_waykeys(key):
 
 
 def dlist_by_waykeys(keylist):
-    # FILTERS KEYS OF SRC DATA
+    """
+    filters for a list of keys from source data
+    """
     if(len(rdw.keys())==0):
         return []
     dictlist = []
@@ -149,6 +153,9 @@ def jobs_api():
 
 @app.route('/jobs/list', methods=['GET'])
 def jobs_list():
+    """
+    Provides user with informational sheet
+    """
     jobs_list = []
     for key in list(rdj.keys()):
         v = rdj.hgetall(key.decode('utf-8'))
@@ -156,9 +163,12 @@ def jobs_list():
             jobs_list.append(decode_byte_dict(v))
     return jsonify(jobs_list)
 
-# DOWNLOADING ROUTE
+
 @app.route('/download/<jid>', methods=['GET'])
 def download(jid):
+    """
+    route for downloading jobs completion data
+    """
     path = f'/app/{jid}.png'
     with open(path, 'wb') as f:
         f.write(rdj.hget(generate_job_key(jid), 'image'))
@@ -224,17 +234,26 @@ def get_data():
 
 @app.route('/perseverance/sol', methods=['GET'])
 def sol_req():
+    """
+    Find recentcy of data set (most recent sol date)
+    """
     allSol = ser_by_waykeys('sol')
     return f'Most recent data waypoint is at Sol-{max(allSol)}\n'
 
 
 @app.route('/perseverance/orientation', methods=['GET'])
 def orientation_req():
+    """
+    filters for and presents all orientation data
+    """
     return jsonify( dlist_by_waykeys(['sol','yaw_rad','pitch','roll']) )
 
 
 @app.route('/perseverance/orientation/yaw', methods=['POST'])
 def yaw_req():
+    """
+    sends job request message to worker for yaw v sol plot
+    """
     if(len(rdw.keys())==0):
         return 'Please use /load with POST route \n'
     try:
@@ -251,6 +270,9 @@ def yaw_req():
 
 @app.route('/perseverance/orientation/pitch', methods=['POST'])
 def pitch_req():
+    """
+    sends job request message to worker for pitch v sol plot
+    """
     if(len(rdw.keys())==0):
         return 'Please use /load with POST route \n'
     try:
@@ -267,6 +289,9 @@ def pitch_req():
 
 @app.route('/perseverance/orientation/roll', methods=['POST'])
 def roll_req():
+    """
+    sends job request message to worker for roll v sol plot
+    """
     if(len(rdw.keys())==0):
         return 'Please use /load with POST route \n'
     try:
@@ -283,11 +308,17 @@ def roll_req():
 
 @app.route('/perseverance/position', methods=['GET'])
 def position_req():
+    """
+    filters for and presents all positioning data
+    """
     return jsonify( dlist_by_waykeys(['sol','lon','lat']) )
 
 
 @app.route('/perseverance/position/longitude', methods=['POST'])
 def lon_req():
+    """
+    sends job request message to worker for longitude v sol plot
+    """
     if(len(rdw.keys())==0):
         return 'Please use /load with POST route \n'
     try:
@@ -304,6 +335,9 @@ def lon_req():
 
 @app.route('/perseverance/position/latitude', methods=['POST'])
 def lat_req():
+    """
+    sends job request message to worker for latitude v sol plot
+    """
     if(len(rdw.keys())==0):
         return 'Please use /load with POST route \n'
     try:
@@ -320,6 +354,9 @@ def lat_req():
 
 @app.route('/perseverance/position/map', methods=['POST'])
 def map_req():
+    """
+    sends job request message to worker for latitude v longitude plot
+    """
     if(len(rdw.keys())==0):
         return 'Please use /load with POST route \n'
     try:

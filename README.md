@@ -69,7 +69,7 @@ It is best that you install these packages they are listed to avoid unforeseen i
 #
 # Explanation of Functionality
 
-
+The API, flask_api.py, itself is a python script which interacts with an assortment of databases and a worker - all which are deployed in three methods: directly, in container, and in Kubernetes. This API is dependent on Flask, a microweb framework used to develop microservices which make up REST APIs (discussed in earlier section). To add routes to be found by external clients of the service, we utilize decorators to a flask variable app. The functionality of these URL routes (employed by the decorators) are fulfilled with various pythons functions to filter the source data and by queuing and queue fulfillment via the worker script. For context, the request package is used to pull and update the source data from the NASA source via the web. The redis package is used to communicate with a database storage so that the API can store the source data sets and queued jobs in a reliable and persistent method. Finally, the hotqueue package is used for sending jobs requested by user to a queue which can work on these jobs in order of request without redundancy and erroneous behavior. The worker (worker.py) is an important component for assisting the API with fulfilling jobs queued by the base API (flask_api.py). The worker utilizes the hotqueue python package to decorate a redis connection variable, q, so that it checks the queue consistently for new jobs from the API. The worker reads the queue and utilizes its functionality to plot job requests one at a time. This is a task queue system in which the flask API is a “producer” which writes a job message to a queue that describe work to be done and the worker script is a “consumer” which receives the message and does the work. This system is important so that multiple “consumers” (API clients) can make messages to the “producer” workers which processes ALL their messages without duplication.
 
 #
 # Starting API with Docker Containers
@@ -123,8 +123,9 @@ Finally, the test_worker.py file contains functions for testing the job-related 
 
 All of the above test are executed utilizing pytest and can be initiated after spinning up the services and containers. One may also need to update the FPORT, BASEROUTE, REDIS_TEST_IP and REDIS_TEST_PORT variables in test files to their own in order to run the database test successfully.
 
-    [P-Tracker/docker]$ docker-compose -p <name> up -d
-    [P-Tracker/test]$ pytest
+    [P-Tracker]$ make run-all
+    [P-Tracker]$ make redis-ip # Gets Redis IP for replacement in test_db.py
+    [P-Tracker]$ pytest
 
 Successful test should give the following response which shows that all tests were successful:
 
@@ -305,15 +306,16 @@ The informational route describes the communication routes with the api best. We
 
 The above command will present the following informational:
 
-    ### Peseverance Tracker ###                                                                                                                   
+     ### Peseverance Tracker ###                                                                                                                   
                                                                                                                                                   
     Informational and Management Routes:                                                                                                          
-    /                                                                      (GET) Print Route Information                                          
+    /help                                                                  (GET) Print Route Information                                          
     /load                                                                  (POST) Loads/Overwrites Data from Perseverance sources                 
                                                                                                                                                   
     Plotting Job Routes:                                                                                                                          
     /download/<jid>                                                        (GET) Get the Job Image from Routes Below                              
     /jobs                                                                  (POST) Post Job for Misc Plot                                          
+    /jobs/list                                                             (GET) List all jobs and their status                                   
     /perseverance/orientation/yaw                                          (POST) Post job for "Yaw v Sol" Plot                                   
     /perseverance/orientation/pitch                                        (POST) Post job for "Pitch v Sol" Plot                                 
     /perseverance/orientation/roll                                         (POST) Post job for "Roll v Sol" Plot                                  
@@ -323,9 +325,9 @@ The above command will present the following informational:
                                                                                                                                                   
     General Rover State Routes:                                                                                                                   
     /perseverance                                                          (GET) List all Waypoint Data                                           
-    /perseverance/sol                                                      (GET) Find Most Recent Sol in Data                                    
+    /perseverance/sol                                                      (GET) List Most Current Sol in Data                                    
     /perseverance/orientation                                              (GET) List All Orientation Data w Sol-Idx                              
-    /perseverance/position                                                 (GET) List All Positioning Data w Sol-Idx  
+    /perseverance/position                                                 (GET) List All Positioning Data w Sol-Idx        
 
 temp
 

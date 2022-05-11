@@ -32,6 +32,7 @@ def test_rdatabase_job():
     jidi = str(requests.post(f'{BASEROUTE}/perseverance/position/latitude',json={"start":str(starti),"end":str(endi)}).text)
     jidi = jidi.replace('The job has entered the hotqueue with ID: \n','')
     jidi = jidi.replace(' \nCheck back at /download/<jid> \n','')
+    jidi = jidi.replace(' ','')
     sleep(1)
     jobdicti = decode_byte_dict(rdj.hgetall(generate_job_key(jidi)) )
     keyslisti = list(jobdicti.keys())
@@ -54,12 +55,14 @@ def test_worker():
     jidmap = str(requests.post(f'{BASEROUTE}/perseverance/position/map',json={"start":startmap,"end":endmap}).text)
     jidmap = jidmap.replace('The job has entered the hotqueue with ID: \n','')
     jidmap = jidmap.replace(' \nCheck back at /download/<jid> \n','')
+    jidmap = jidmap.replace(' ','')
 
     startmisc = 0
     endmisc = 400
     jidmisc = str(requests.post(f'{BASEROUTE}/jobs',json={"type":"way","xkey":"lon","ykey":"yaw","start":startmisc,"end":endmisc}).text)
     jidmisc = jidmisc.replace('The job has entered the hotqueue with ID: \n','')
-    jidmisc = jidmisc.replace(' \nCheck back at /download/<jid> \n ','')
+    jidmisc = jidmisc.replace(' \nCheck back at /download/<jid> \n','')
+    jidmisc = jidmisc.replace(' ','')
     
     sleep(1)
     jobdictmap = decode_byte_dict(rdj.hgetall(generate_job_key(jidmap)) )

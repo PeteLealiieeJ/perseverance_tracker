@@ -71,7 +71,7 @@ def generate_plot_key(titlei,xlabeli,ylabeli):
 
 # INFORMATIONAL CARDS 
 ### USAGE INFOFORMATION FUNCTION
-@app.route('/', methods=['GET'])
+@app.route('/help', methods=['GET'])
 def usage_info():
     """                                                                                                                                                                                              
     Called to print usage information for API
@@ -83,7 +83,7 @@ def usage_info():
         ['### Peseverance Tracker ###', ''],
         ['',''],
         ['Informational and Management Routes:', ''],
-        ['/', '(GET) Print Route Information'],
+        ['/help', '(GET) Print Route Information'],
         ['/load', '(POST) Loads/Overwrites Data from Perseverance sources'  ],
     ]
 

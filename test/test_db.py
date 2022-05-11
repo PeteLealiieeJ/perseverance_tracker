@@ -13,7 +13,7 @@ from jobs import generate_way_key, generate_trav_key
 
 FPORT = 5015
 BASEROUTE = f'http://localhost:{FPORT}'
-requests.post(f'{BASEROUTE}/')
+requests.post(f'{BASEROUTE}/load')
 
 # MUST BE CHANGED EVERYTIME CONTAINER ISN'T SET
 REDIS_TEST_IP = '172.17.0.17'

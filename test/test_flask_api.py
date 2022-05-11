@@ -4,7 +4,7 @@ from typing import Type
 
 FPORT = 5015
 BASEROUTE = f'http://localhost:{FPORT}'
-requests.post(f'{BASEROUTE}/')
+requests.post(f'{BASEROUTE}/load')
 
 
 def test_route_perseverance():

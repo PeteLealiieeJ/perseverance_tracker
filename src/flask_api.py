@@ -69,6 +69,57 @@ def generate_plot_key(titlei,xlabeli,ylabeli):
 # FLASK ROUTE FUNCTIONS 
 ####################################################################################################
 
+# INFORMATIONAL CARDS 
+### USAGE INFOFORMATION FUNCTION
+@app.route('/', methods=['GET'])
+def usage_info():
+    """                                                                                                                                                                                              
+    Called to print usage information for API
+        (none)                                                                                                                                  
+    returns:                                                                                                                                                                                         
+        (str) Formatted Usage Information for users                                                                                                                            
+    """
+    usage_tab = [
+        ['### Peseverance Tracker ###', ''],
+        ['',''],
+        ['Informational and Management Routes:', ''],
+        ['/', '(GET) Print Route Information'],
+        ['/load', '(POST) Loads/Overwrites Data from Perseverance sources'  ],
+    ]
+
+    job_tab = [
+        ['Plotting Job Routes:', ''],
+        ['/download/<jid>', '(GET) Get the Job Image from Routes Below'],        
+        ['/jobs', '(POST) Post Job for Misc Plot'],
+        ['/perseverance/orientation/yaw', '(POST) Post job for "Yaw v Sol" Plot'],
+        ['/perseverance/orientation/pitch', '(POST) Post job for "Pitch v Sol" Plot'],
+        ['/perseverance/orientation/roll', '(POST) Post job for "Roll v Sol" Plot'],
+        ['/perseverance/position/longitude', '(POST) Post job for "Longitude v Sol" Plot'],
+        ['/perseverance/position/latitude', '(POST) Post job for "Latitude v Sol" Plot'],
+        ['/perseverance/position/map', '(POST) Post job for "Latitude v Longitude" Plot'],
+    ]
+    
+    general_tab = [
+        ['General Rover State Routes:',''],
+        ['/perseverance','(GET) List all Waypoint Data'],
+        ['/perseverance/sol','(GET) List Most Current Sol in Data'],
+        ['/perseverance/orientation','(GET) List All Orientation Data w Sol-Idx'],
+        ['/perseverance/position','(GET) List All Positioning Data w Sol-Idx'],
+
+    ]
+
+    spacer_tab = [
+        ['',''],
+    ]
+
+    full_tab = usage_tab + spacer_tab + job_tab + spacer_tab + general_tab + spacer_tab
+    usage_str = '\n'
+    for x in full_tab:
+        usage_str += ( "    {: <70} {: <70} ".format(*x) + '\n' )
+    return usage_str
+
+
+
 # ROUTE FOR REQUESTING PLOTTING JOB
 @app.route('/jobs', methods=['POST'])
 def jobs_api():

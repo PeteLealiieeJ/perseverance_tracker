@@ -183,7 +183,7 @@ def load_data():
     for ii in range(len( pulled_trav_data)):
         rdt.set( generate_trav_key(ii), json.dumps( pulled_trav_data[ii]) )
 
-    return f'Data has been loaded from the Source URLs below: \n WAYPOINTS: {WAYPOINT_SRC_URL} \n TRAVERSAL: {TRAVERSE_SRC_URL} \n '
+    return f'Data has been loaded from the Source URLs below: \n WAYPOINTS: {WAYPOINT_SRC_URL} \n TRAVERSAL: {TRAVERSE_SRC_URL} \n'
 
 
 ### RETURNS ALL RELEVANT WAYPOINT SOURCES DATA
@@ -225,7 +225,7 @@ def get_data():
 @app.route('/perseverance/sol', methods=['GET'])
 def sol_req():
     allSol = ser_by_waykeys('sol')
-    return f'Most recent data waypoint is at Sol-{max(allSol)}'
+    return f'Most recent data waypoint is at Sol-{max(allSol)}\n'
 
 
 @app.route('/perseverance/orientation', methods=['GET'])
@@ -246,7 +246,7 @@ def yaw_req():
                             generate_plot_key('Perseverance: Rover Yaw v Time','Time [sol]','Yaw [rads]'), 
                             req['start'], 
                             req['end'] ) 
-    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
+    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n'
 
 
 @app.route('/perseverance/orientation/pitch', methods=['POST'])
@@ -262,7 +262,7 @@ def pitch_req():
                             generate_plot_key('Perseverance: Rover Pitch v Time','Time [sol]','Pitch [rads]'), 
                             req['start'], 
                             req['end'] ) 
-    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
+    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n'
 
 
 @app.route('/perseverance/orientation/roll', methods=['POST'])
@@ -278,7 +278,7 @@ def roll_req():
                             generate_plot_key('Perseverance: Rover Roll v Time','Time [sol]','Roll [rads]'), 
                             req['start'], 
                             req['end'] ) 
-    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
+    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n'
 
 
 @app.route('/perseverance/position', methods=['GET'])
@@ -299,7 +299,7 @@ def lon_req():
                             generate_plot_key('Perseverance: Rover Longitude v Time','Time [sol]','Longitude [deg]'), 
                             req['start'], 
                             req['end'] ) 
-    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
+    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n'
 
 
 @app.route('/perseverance/position/latitude', methods=['POST'])
@@ -315,7 +315,7 @@ def lat_req():
                             generate_plot_key('Perseverance: Rover Latitude v Time','Time [sol]','Latitude [deg]'), 
                             req['start'], 
                             req['end'] ) 
-    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
+    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n'
 
 
 @app.route('/perseverance/position/map', methods=['POST'])
@@ -331,7 +331,7 @@ def map_req():
                             generate_plot_key('Perseverance: Rover Longitude v Latitude','Latitude [deg]','Longitude [deg]'), 
                             req['start'], 
                             req['end'] ) 
-    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n '
+    return f'The job has entered the hotqueue with ID: \n{retjid} \nCheck back at /download/<jid> \n'
 
 
 ### SECONDARY DATA ROUTES (USES TRAVERSE SRC URL) ###

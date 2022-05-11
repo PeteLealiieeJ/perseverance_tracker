@@ -2,18 +2,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: py-debug-deployment
+  name: py-debug-deployment-test
   labels:
-    app: py-app
+    app: py-app-test
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: py-app
+      app: py-app-test
   template:
     metadata:
       labels:
-        app: py-app
+        app: py-app-test
     spec:
       containers:
         - name: py39

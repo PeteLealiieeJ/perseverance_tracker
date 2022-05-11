@@ -150,7 +150,7 @@ def jobs_api():
 def jobs_list():
     jobs_list = []
     for key in list(rdj.keys()):
-        v = rdj.get(key)
+        v = rdj.hgetall(key.decode('utf-8'))
         if not v is None:
             jobs_list.append(decode_byte_dict(v))
     return jsonify(jobs_list)

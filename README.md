@@ -235,4 +235,34 @@ After deploying the flask and redis servers via the instructions in the section 
 The next section will go into more specifics on the routes available to users. 
 
 # Communicating with perseverance-tracker API
-    curl localhost:5015/perseverance/orientation/yaw -X POST  -H 'Content-Type: application/json' -d '{"start":"0","end":"400"}'
+The informational route describes the communication routes with the api best. We can use the informational route and visualize the routes of the api with the  following command. Note that if the user is running with the images, <IPaddress\> is usually the localhost. If using the kubernetes deployment, the user must be in a python deployment and the <IPaddress\> will be the IPCluster (in the previous section <flask-service-CLUSTERIP\>).
+
+    []$ curl <IPaddress>:5015
+
+The above command will present the following informational:
+
+    ### Peseverance Tracker ###                                                                                                                   
+                                                                                                                                                  
+    Informational and Management Routes:                                                                                                          
+    /                                                                      (GET) Print Route Information                                          
+    /load                                                                  (POST) Loads/Overwrites Data from Perseverance sources                 
+                                                                                                                                                  
+    Plotting Job Routes:                                                                                                                          
+    /download/<jid>                                                        (GET) Get the Job Image from Routes Below                              
+    /jobs                                                                  (POST) Post Job for Misc Plot                                          
+    /perseverance/orientation/yaw                                          (POST) Post job for "Yaw v Sol" Plot                                   
+    /perseverance/orientation/pitch                                        (POST) Post job for "Pitch v Sol" Plot                                 
+    /perseverance/orientation/roll                                         (POST) Post job for "Roll v Sol" Plot                                  
+    /perseverance/position/longitude                                       (POST) Post job for "Longitude v Sol" Plot                             
+    /perseverance/position/latitude                                        (POST) Post job for "Latitude v Sol" Plot                              
+    /perseverance/position/map                                             (POST) Post job for "Latitude v Longitude" Plot                        
+                                                                                                                                                  
+    General Rover State Routes:                                                                                                                   
+    /perseverance                                                          (GET) List all Waypoint Data                                           
+    /perseverance/sol                                                      (GET) List Most Current Sol in Data                                    
+    /perseverance/orientation                                              (GET) List All Orientation Data w Sol-Idx                              
+    /perseverance/position                                                 (GET) List All Positioning Data w Sol-Idx  
+
+temp
+
+curl localhost:5015/perseverance/orientation/yaw -X POST  -H 'Content-Type: application/json' -d '{"start":"0","end":"400"}'

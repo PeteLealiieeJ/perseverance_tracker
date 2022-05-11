@@ -29,13 +29,13 @@ def test_rdatabase_job():
     """
     starti = 0
     endi = 400
-    jidi = requests.post(f'{BASEROUTE}/perseverance/position/latitude',json={"start":str(starti),"end":str(endi)})
+    jidi = str(requests.post(f'{BASEROUTE}/perseverance/position/latitude',json={"start":str(starti),"end":str(endi)}).text)
     jidi = jidi.replace('The job has entered the hotqueue with ID: \n','')
     jidi = jidi.replace(' \nCheck back at /download/<jid> \n','')
-    jobdicti = decode_byte_dict(rdj.hgetall(generate_job_key(jidi)) )
-
     sleep(1)
-    assert list(jobdicti.keys()) == ["pltopt","status","id","datakeys","end","start"]
+    jobdicti = decode_byte_dict(rdj.hgetall(generate_job_key(jidi)) )
+    keyslisti = list(jobdicti.keys())
+    assert all( x in ["pltopt","status","id","datakeys","end","start"] for x in keyslisti)
     assert jobdicti["status"] == "complete"
     assert jobdicti["start"] == str(starti)
     assert jobdicti["end"] == str(endi)
@@ -51,19 +51,20 @@ def test_worker():
     """
     startmap = 0
     endmap = 400
-    jidmap = requests.post(f'{BASEROUTE}/perseverance/position/map',json={"start":startmap,"end":endmap})
+    jidmap = str(requests.post(f'{BASEROUTE}/perseverance/position/map',json={"start":startmap,"end":endmap}).text)
     jidmap = jidmap.replace('The job has entered the hotqueue with ID: \n','')
     jidmap = jidmap.replace(' \nCheck back at /download/<jid> \n','')
-    jobdictmap = decode_byte_dict(rdj.hgetall(generate_job_key(jidmap)) )
 
     startmisc = 0
     endmisc = 400
-    jidmisc = requests.post(f'{BASEROUTE}/jobs',json={"type":"way","xkey":"lon","ykey":"yaw","start":startmisc,"end":endmisc})
+    jidmisc = str(requests.post(f'{BASEROUTE}/jobs',json={"type":"way","xkey":"lon","ykey":"yaw","start":startmisc,"end":endmisc}).text)
     jidmisc = jidmisc.replace('The job has entered the hotqueue with ID: \n','')
-    jidmisc = jidmisc.replace(' \nCheck back at /download/<jid> \n','')
+    jidmisc = jidmisc.replace(' \nCheck back at /download/<jid> \n ','')
+    
+    sleep(1)
+    jobdictmap = decode_byte_dict(rdj.hgetall(generate_job_key(jidmap)) )
     jobdictmisc = decode_byte_dict(rdj.hgetall(generate_job_key(jidmisc)) )
 
-    sleep(3)
     assert jobdictmap["status"] == "complete"
     assert jobdictmisc["status"] == "complete"
 

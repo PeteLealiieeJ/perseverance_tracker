@@ -68,6 +68,8 @@ push-api:
 push-wrk:
 	docker push ${NSPACE}/${APP}-wrk:${VER}
 
+redis-ip:
+	echo $$(docker inspect ${NSPACE}-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}')
 
 build-all: build-db build-api build-wrk
 

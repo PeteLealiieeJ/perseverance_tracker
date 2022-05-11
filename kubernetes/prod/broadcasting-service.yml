@@ -14,4 +14,4 @@ spec:
   - name: petenick-flask
     port: 5000
     targetPort: 5000
-    nodePort: 30042
+    nodePort: 30015

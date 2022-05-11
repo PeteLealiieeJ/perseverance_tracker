@@ -129,15 +129,15 @@ All of the above test are executed utilizing pytest and can be initiated after s
 Successful test should give the following response which shows that all tests were successful:
 
     ======================================================================================== test session starts =========================================================================================
-platform linux -- Python 3.6.8, pytest-7.0.1, pluggy-1.0.0
-rootdir: /home/pete0100/perseverance_tracker/test
-collected 8 items                                                                                                                                                                                    
+    platform linux -- Python 3.6.8, pytest-7.0.1, pluggy-1.0.0
+    rootdir: /home/pete0100/perseverance_tracker/test
+    collected 8 items                                                                                                                                                                                    
 
-test_db.py ..                                                                                                                                                                                  [ 25%]
-test_flask_api.py ....                                                                                                                                                                         [ 75%]
-test_worker.py ..                                                                                                                                                                              [100%]
+    test_db.py ..                                                                                                                                                                                  [ 25%]
+    test_flask_api.py ....                                                                                                                                                                         [ 75%]
+    test_worker.py ..                                                                                                                                                                              [100%]
 
-========================================================================================= 8 passed in 0.33s ==========================================================================================
+    ========================================================================================= 8 passed in 0.33s ==========================================================================================
 
 If the test are not successful then post the issue to the github repository page.
 

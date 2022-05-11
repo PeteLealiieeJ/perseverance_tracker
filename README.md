@@ -62,20 +62,84 @@ The following packages are required for direct use and are installed during cont
 
 Each of the above python <package\> s can be installed locally with pip via
 
-    pip install <package>
+    pip install --user <package>
 
 It is best that you install these packages they are listed to avoid unforeseen issues. (users should install tornado before matlibplot to avoid recent issues experienced with python3 dependencies) 
 
 #
 # Explanation of Functionality
 
+
+
+#
+# Starting API with Docker Containers
+The functionality of this repository can be containerized with docker via the dockerfiles and docker-compose file located in the [docker folder](./docker/) of this repository. The simpliest method of creating and running the containers of this repository is to utilize the docker-compose file. We can start up the api, worker and redis server via the following command:
+
+    [P-Tracker/docker]$ docker-compose -p <namespace> up -d
+
+from here the IPAdress of the application server is usually the localhost. From this point you can access all routes on the 5015 port of the localhost. See all routes in the **Communicating with perseverance-tracker API** section at the bottom of this README. When finished, all of the images can be spun down with the following command:
+
+    [P-Tracker/docker]$ docker-compose -p <namespace> down
+
+Alternatively, one could build and run the images with the following commands:
+
+    [P-Tracker]$ docker build -t ${NSPACE}/${APP}-wrk:${VER} -f docker/Dockerfile.wrk .
+    [P-Tracker]$ docker build -t ${NSPACE}/${APP}-api:${VER} -f docker/Dockerfile.api .
+    [P-Tracker]$ docker run --name ${NSPACE}-db -p ${RPORT}:6379 -d  -u ${UID}:${GID} -v ${PWD}/data/:/data redis:6 --save 1 1
+    [P-Tracker]$ docker run --name ${NSPACE}-wrk --env REDIS_IP=$$(docker inspect ${NSPACE}-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') -d ${NSPACE}/${APP}-wrk:${VER} 
+    [P-Tracker]$ docker run --name ${NSPACE}-api --env REDIS_IP=$$(docker inspect ${NSPACE}-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') -p ${FPORT}:5000 -d ${NSPACE}/${APP}-api:${VER} 
+
+
+(i.e. for isp users)
+
+    [P-Tracker]$ docker build -t petelealiieej/perseverance-tracker-wrk:${VER} -f docker/Dockerfile.wrk .
+    [P-Tracker]$ docker build -t petelealiieej/perseverance-tracker-api:${VER} -f docker/Dockerfile.api .
+    [P-Tracker]$ docker run --name petelealiieej-db -p 6415:6379 -d  -u ${UID}:${GID} -v ${PWD}/data/:/data redis:6 --save 1 1
+    [P-Tracker]$ docker run --name petelealiieej-wrk --env REDIS_IP=$$(docker inspect petelealiieej-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') -d petelealiieej/perseverance-tracker-wrk:0.1
+    [P-Tracker]$ docker run --name petelealiieej-api --env REDIS_IP=$$(docker inspect petelealiieej-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') -p 5015:5000 -d petelealiieej/perseverance-tracker-api:0.1
+
+These steps are automated with the following Make command:
+    
+    []$ make run-all
+
+and can be spun down wit the following:
+
+    []$ make clean-all
+
+Again, from here the IPAdress of the application server is usually the localhost. From this point you can access all routes on the 5015 port of the localhost. See all routes in the **Communicating with perseverance-tracker API** section at the bottom of this README.
+
 #
 # Integration Testing Application, Worker, Database
+Integration tests are done via pytest and test the functionality of the flask application, worker and database in the following files:
+- [test_db.py](./test/test_db.py)
+- [test_flask_api.py](./test/test_flask_api.py)
+- [test_worker.py](./test/test_worker.py)
 
+Firstly, the test_db.py file contains functions for testing the database. This file includes functions to test both the waypoint and traverse databases containing the traverse and waypoint data, respectively . These test include checking that all the redis keys match the formatting created with the respective *generate_way_key()* and *generate_trav_key()* functions, and checking that the data stored in the database have the appropriate dictionary keys and value types.
 
-#
-# Running in With Docker Containers
+Next, the test_flask_api.py file contains functions for testing the non-job-related routes of the flask application. This file includes functions to test the (GET) routes and load (POST) route - and the other (POST) routes which interact with the worker script are reserved for the test_worker.py script. These tests include checking that all the flask routes return appropriately formatted responses, successful response codes, and appropriately types from response content, lists, and dictionaries.
 
+Finally, the test_worker.py file contains functions for testing the job-related routes of the flask application. This file includes functions to test all job (POST) routes and the download (GET) routes - and the other (POST) routes which do not interact with the worker script are reserved for the test_flask_api.py script. These tests include checking that all the flask routes return appropriately formatted responses, successful response codes, and appropriately types from response content, lists, and dictionaries. 
+
+All of the above test are executed utilizing pytest and can be initiated after spinning up the services and containers. One may also need to update the FPORT, BASEROUTE, REDIS_TEST_IP and REDIS_TEST_PORT variables in test files to their own in order to run the database test successfully.
+
+    [P-Tracker/docker]$ docker-compose -p <name> up -d
+    [P-Tracker/test]$ pytest
+
+Successful test should give the following response which shows that all tests were successful:
+
+    ======================================================================================== test session starts =========================================================================================
+platform linux -- Python 3.6.8, pytest-7.0.1, pluggy-1.0.0
+rootdir: /home/pete0100/perseverance_tracker/test
+collected 8 items                                                                                                                                                                                    
+
+test_db.py ..                                                                                                                                                                                  [ 25%]
+test_flask_api.py ....                                                                                                                                                                         [ 75%]
+test_worker.py ..                                                                                                                                                                              [100%]
+
+========================================================================================= 8 passed in 0.33s ==========================================================================================
+
+If the test are not successful then post the issue to the github repository page.
 
 
 #
@@ -259,7 +323,7 @@ The above command will present the following informational:
                                                                                                                                                   
     General Rover State Routes:                                                                                                                   
     /perseverance                                                          (GET) List all Waypoint Data                                           
-    /perseverance/sol                                                      (GET) List Most Current Sol in Data                                    
+    /perseverance/sol                                                      (GET) Find Most Recent Sol in Data                                    
     /perseverance/orientation                                              (GET) List All Orientation Data w Sol-Idx                              
     /perseverance/position                                                 (GET) List All Positioning Data w Sol-Idx  
 

@@ -6,6 +6,7 @@ import json
 import sys, os
 from time import sleep
 from test_db import REDIS_TEST_IP, REDIS_TEST_PORT
+from test_flask_api import FPORT
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
@@ -14,7 +15,6 @@ sys.path.append(f'{parentdir}/src')
 from jobs import get_job_by_id,decode_byte_dict,generate_job_key
 
 # LOAD DATA TO REDIS SERVICE
-FPORT = 5015
 BASEROUTE = f'http://localhost:{FPORT}'
 requests.post(f'{BASEROUTE}/')
 

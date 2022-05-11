@@ -1,12 +1,12 @@
 #
 # Perseverance Tracker - Understanding the Martian Rover 
-This repository contains an API which tracks the Perseverance rover's traversal across the Martian surface, and provides data which is useful for understanding the Perseverance Rovers performance and state during the duration of its time on Mars. This repository contains the components and instructions necessary to deploy this API in an Image (with Docker) and on Kubernetes, so that the user can receive and visualize data from the rover with plots and responses from the API.
+This repository contains an API which tracks the Perseverance rover's traversal across the Martian surface, and provides data which is useful for understanding the Perseverance Rovers performance and state during the duration of its time on Mars. This repository contains the components and instructions necessary to deploy this API in an Image (with Docker) and on Kubernetes so that the user can receive and visualize data from the rover with plots and responses from the API.
 
-Firstly, the source data used for this API comes from NASA and can be found in the two links below. (Note that the repo uses only the Waypoint dataset; However, the traversal dataset is also stored on Redis volume for possible future use to make more accurate mapping plots)
+Firstly, the source data used for this API comes from NASA and can be found in the two links below. (Note that the repo uses only the Waypoint dataset; However, the traversal dataset is also stored on the Redis volume for possible future use to make more accurate mapping plots)
 - [Waypoint](https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json)
 - [Traverse](https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_traverse.json)
 
-The Waypoint data is formatted as a json dictionary with a type and name identifier and (most applicably) a features list which provide important state and performance data indexed by sol-time. The json is formatted as seen below (note that we only provide a single element from the "features" list due to the length of data)
+The Waypoint data is formatted as a json dictionary with a type and name identifier and (most applicably) a features list which provides important state and performance data indexed by sol-time. The json is formatted as seen below (note that we only provide a single element from the "features" list due to the length of data)
 
     {
         "type": "FeatureCollection",
@@ -50,7 +50,7 @@ The Waypoint data is formatted as a json dictionary with a type and name identif
 
 #
 # Requirements for Local Use and Testing 
-The following packages are required for direct use and are installed during container docker containerization (except for pytest which is only necessary for functionality testing)
+The following packages are required for direct use and are installed during docker containerization (except for pytest which is only necessary for functionality testing)
 
 1. Flask 
 2. requests 
@@ -92,8 +92,8 @@ Alternatively, one could build and run the images with the following commands:
 
 (i.e. for isp users)
 
-    [P-Tracker]$ docker build -t petelealiieej/perseverance-tracker-wrk:${VER} -f docker/Dockerfile.wrk .
-    [P-Tracker]$ docker build -t petelealiieej/perseverance-tracker-api:${VER} -f docker/Dockerfile.api .
+    [P-Tracker]$ docker build -t petelealiieej/perseverance-tracker-wrk:0.1 -f docker/Dockerfile.wrk .
+    [P-Tracker]$ docker build -t petelealiieej/perseverance-tracker-api:0.1 -f docker/Dockerfile.api .
     [P-Tracker]$ docker run --name petelealiieej-db -p 6415:6379 -d  -u ${UID}:${GID} -v ${PWD}/data/:/data redis:6 --save 1 1
     [P-Tracker]$ docker run --name petelealiieej-wrk --env REDIS_IP=$$(docker inspect petelealiieej-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') -d petelealiieej/perseverance-tracker-wrk:0.1
     [P-Tracker]$ docker run --name petelealiieej-api --env REDIS_IP=$$(docker inspect petelealiieej-db | grep \"IPAddress\" | head -n1 | awk -F\" '{print $$4}') -p 5015:5000 -d petelealiieej/perseverance-tracker-api:0.1
@@ -117,15 +117,25 @@ Integration tests are done via pytest and test the functionality of the flask ap
 
 Firstly, the test_db.py file contains functions for testing the database. This file includes functions to test both the waypoint and traverse databases containing the traverse and waypoint data, respectively . These test include checking that all the redis keys match the formatting created with the respective *generate_way_key()* and *generate_trav_key()* functions, and checking that the data stored in the database have the appropriate dictionary keys and value types.
 
-Next, the test_flask_api.py file contains functions for testing the non-job-related routes of the flask application. This file includes functions to test the (GET) routes and load (POST) route - and the other (POST) routes which interact with the worker script are reserved for the test_worker.py script. These tests include checking that all the flask routes return appropriately formatted responses, successful response codes, and appropriately types from response content, lists, and dictionaries.
+Next, the test_flask_api.py file contains functions for testing the non-job-related routes of the flask application. This file includes functions to test the (GET) routes and load (POST) route - all other (POST) routes which interact with the worker script are reserved for the test_worker.py script. These tests include checking that all the flask routes return appropriately formatted responses, successful response codes, and appropriately types from response content, lists, and dictionaries.
 
-Finally, the test_worker.py file contains functions for testing the job-related routes of the flask application. This file includes functions to test all job (POST) routes and the download (GET) routes - and the other (POST) routes which do not interact with the worker script are reserved for the test_flask_api.py script. These tests include checking that all the flask routes return appropriately formatted responses, successful response codes, and appropriately types from response content, lists, and dictionaries. 
+Finally, the test_worker.py file contains functions for testing the job-related routes of the flask application. This file includes functions to test all job (POST) routes and the download (GET) routes - all  other (POST) routes which do not interact with the worker script are reserved for the test_flask_api.py script. These tests include checking that all the flask routes return appropriately formatted responses, successful response codes, and appropriately types from response content, lists, and dictionaries. 
 
-All of the above test are executed utilizing pytest and can be initiated after spinning up the services and containers. One may also need to update the FPORT, BASEROUTE, REDIS_TEST_IP and REDIS_TEST_PORT variables in test files to their own in order to run the database test successfully.
+All of the above test are executed utilizing pytest and can be initiated after spinning up the services and containers. 
 
+NOTE: One must also update the FPORT, BASEROUTE, REDIS_TEST_IP and REDIS_TEST_PORT variables in test files to their own in order to run the database test successfully.First run the following:
+
+    [P-tracker]$ make clean-all
     [P-Tracker]$ make run-all
-    [P-Tracker]$ make redis-ip # Gets Redis IP for replacement in test_db.py
-    [P-Tracker]$ pytest
+    [P-Tracker]$ make redis-ip 
+
+    #returns the redis ip address
+
+The IP address you get from the above command must then be copy and pasted into the test_db.py variable, **REDIS_TEST_IP** (line 19). It only needs to be changed here because this variable is imported to the other test files when necessary. Assumming that you've run the containers locally without altering the dockerfile, the FPORT, BASEROUTE, and REDIS_TEST_PORT should be the same. If running on a different port, be sure to change the **FPORT** variable on line 5 of **test_flask.py**.
+
+After that, one can run pytest with the following command in the test folder
+
+    [P-Tracker/test]$ pytest
 
 Successful test should give the following response which shows that all tests were successful:
 
@@ -195,7 +205,7 @@ After getting the clusterIP of the redis service, open the [job.py](src/jobs.py)
 
     REDIS_SERVICE_IP = "some string"
 
- in line 13 to your personal cluster ip found in the previous section. Then build the image per the steps below for your own docker image for the flask application
+ on line 13 to your personal cluster ip found in the previous section. Then build the image per the steps below for your own docker image for the flask application
 
 To build and push an image of the application and worker via docker you can run the following command:
 
@@ -224,9 +234,10 @@ Because the image is already built and exist on Dockerhub, the Kubernete flask d
 To deploy the api and worker onto a Kubernete system we have proved the following yaml files in the [kubernetes test folder](./kubernetes/test) to command a Kubernete system:
 
 - ptracker-api-deployment.yml
+- ptracker-wrk-deployment.yml
 - ptracker-api-service.yml
 
-Firstly, we will need to change the "ptracker-api-deployment.yml" so that the flask deployment will use YOUR image and redis IP address when deploying onto the Kubernete system. Open the "ptracker-api-deployment.yml" and change the spec.template.spec.containers.image value to your pushed docker image from the section before.
+Firstly, you may need to change the **ptracker-api-deployment.yml** so that the flask deployment will use YOUR image and redis IP address when deploying onto the Kubernete system. Open the **ptracker-api-deployment**.yml" and change the spec.template.spec.containers.image value to your pushed docker image from the section before.
 
 Next deploy the flask application and worker onto the Kubernete system with the following command:
 
@@ -299,10 +310,41 @@ After deploying the flask and redis servers via the instructions in the section 
 
 The next section will go into more specifics on the routes available to users. 
 
-# Communicating with perseverance-tracker API
-The informational route describes the communication routes with the api best. We can use the informational route and visualize the routes of the api with the  following command. Note that if the user is running with the images, <IPaddress\> is usually the localhost. If using the kubernetes deployment, the user must be in a python deployment and the <IPaddress\> will be the IPCluster (in the previous section <flask-service-CLUSTERIP\>).
+#
+# Kubernetes - Exposing to the Public
+To broadcast the API services publicly from a Kubernete system we have proved the following yaml files in the [kubernetes prod folder](./kubernetes/prod) to command a Kubernete system:
 
-    []$ curl <IPaddress>:5015
+- broadcasting-service.yml
+
+To expose the kubernete deployment to the public internet we can deploy a node port broadcasting service with the following command
+    
+    [.../kubernetes/prod]$ kubectl apply -f broadcasting-service.yml
+
+Checking th kubernete services we can see the following
+
+    [kube]$ kubectl get services
+
+    NAME                                   TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+    ptracker-petenick-broadcast-service    NodePort    10.107.73.208    <none>        5000:30015/TCP   115m
+    ...
+
+This has allowed us to expose the API service on the following URL:
+
+    https://isp-proxy.tacc.utexas.edu/pete0100-1/<route>
+
+If you have an internet connection and assuming the kubernete deployment is still running, one could **curl** the public address (where that address <publicaddress\> is <IPaddress\>:<port\> in the next section) above with route requests without needing to build anything in this image. 
+
+
+#
+# Communicating with perseverance-tracker API
+The informational route describes the communication routes with the API best. We can use the informational route and visualize the routes of the api with the  following command. Note that if the user is running with the images, <IPaddress\> is usually the localhost. If using the kubernetes deployment, the user must be in a python deployment and the <IPaddress\> will be the IPCluster (<flask-service-CLUSTERIP\>). If the kubernete is publicly exposed then <IPaddress\>:<port\> will be <publicaddress\> 
+
+    []$ curl <IPaddress>:<port>/help
+
+(because its more understandable to use the public address we will do so in the following examples )
+
+    []$ curl https://isp-proxy.tacc.utexas.edu/pete0100-1/help       
+
 
 The above command will present the following informational:
 
@@ -329,6 +371,89 @@ The above command will present the following informational:
     /perseverance/orientation                                              (GET) List All Orientation Data w Sol-Idx                              
     /perseverance/position                                                 (GET) List All Positioning Data w Sol-Idx        
 
-temp
+This is an informational sheet which describes are the routes and job requests
 
-curl localhost:5015/perseverance/orientation/yaw -X POST  -H 'Content-Type: application/json' -d '{"start":"0","end":"400"}'
+#
+
+The next route is the /load route which is used to overwrite (Create, Update, and Delete) the data stored on the redis database - which is being used by all other routes to display and plot data. If load dependent routes are called before data loading, users will be asked to execute the load route:
+
+    []$ curl https://isp-proxy.tacc.utexas.edu/pete0100-1/load -X POST
+
+this route also returns the source urls for credibility:
+
+    WAYPOINTS: https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json 
+    TRAVERSAL: https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_traverse.json 
+
+#
+
+After loading (or overwriting) the databases with the source Json, the user gains access to the other routes shown in the informational. Let’s just look at the perseverance/sol route from the General Rover State Routes section of the informational:
+
+    []$ curl https://isp-proxy.tacc.utexas.edu/pete0100-1/perseverance/sol  
+
+The command above will return the most recent sol index of the data set so the users can understand the currency of the currently loaded database
+
+    Most recent data waypoint is at Sol-434
+
+#
+
+Next, we can visualize the plotting jobs with the following commands. In the code snippet below, we make three job requests to the worker: one with the /perseverance/orientation/yaw route, one with the /perseverance/orientation/map route, and one with the /jobs route. 
+
+    []$ curl https://isp-proxy.tacc.utexas.edu/pete0100-1/perseverance/position/map -H 'Content-Type: application/json' -d '{"start":"0","end":"433"}'
+
+    The job has entered the hotqueue with ID: 
+    4c334277-bb90-4c9f-b850-1564ac99e0c2 
+    Check back at /download/<jid> 
+
+    []$ curl https://isp-proxy.tacc.utexas.edu/pete0100-1/perseverance/orientation/yaw -H 'Content-Type: application/json' -d '{"start":"0","end":"200"}'
+
+    The job has entered the hotqueue with ID: 
+    b8fabe70-9639-4b3f-a2e2-bd9e854237de 
+    Check back at /download/<jid> 
+
+    []$ curl https://isp-proxy.tacc.utexas.edu/pete0100-1/jobs -H 'Content-Type: application/json' -d '{"type":"way","xkey":"lon","ykey":"yaw","start":"-180","end":"180"}'
+
+    The job has entered the hotqueue with ID: 
+    23a05124-6e8c-4704-a958-b5ea8883e97e 
+    Check back at /download/<jid> 
+
+
+Notice in the snippet below, that if we check the /jobs/list route after each - we can see what jobs have been completed. Also, notice that the Json package injected into the request takes in a start and stop key for predefined routes and an additional xkey, ykey, and type key for the miscellaneous /jobs route:
+
+    []$ curl https://isp-proxy.tacc.utexas.edu/pete0100-1/jobs/list                                                                                  
+
+    [
+    {
+        "datakeys": "{\"type\": \"way\", \"xdata\": \"lat\", \"ydata\": \"lon\"}", 
+        "start": "0", 
+        "end": "433", 
+        "id": "4c334277-bb90-4c9f-b850-1564ac99e0c2", 
+        "pltopt": "{\"title\": \"Perseverance: Rover Longitude v Latitude\", \"xlabel\": \"Latitude [deg]\", \"ylabel\": \"Longitude [deg]\"}", 
+        "status": "complete"
+    }, 
+    {
+        "datakeys": "{\"type\": \"way\", \"xdata\": \"sol\", \"ydata\": \"yaw_rad\"}", 
+        "start": "0", 
+        "end": "200", 
+        "id": "b8fabe70-9639-4b3f-a2e2-bd9e854237de", 
+        "pltopt": "{\"title\": \"Perseverance: Rover Yaw v Time\", \"xlabel\": \"Time [sol]\", \"ylabel\": \"Yaw [rads]\"}", 
+        "status": "complete"
+    }, 
+    {
+        "datakeys": "{\"type\": \"way\", \"xdata\": \"lon\", \"ydata\": \"yaw\"}", 
+        "start": "-180", 
+        "end": "180", 
+        "id": "23a05124-6e8c-4704-a958-b5ea8883e97e", 
+        "pltopt": "{\"title\": \"Perseverance: Rover yaw v lon\", \"xlabel\": \"lon\", \"ylabel\": \"yaw\"}", 
+        "status": "complete"
+    }
+    ]
+
+#
+
+Finally, using the job id found on return after job request and in the job list indices as the "id" key, one could download the image created by the worker to their local machine with the following command
+
+    []$ curl https://isp-proxy.tacc.utexas.edu/pete0100-1/download/<jid> > ~/<local-dir>/<image-name>.png
+
+(i.e.) to download the Yaw v Time plot above to their downloads fodler, one would run the following:
+
+    []$ curl https://isp-proxy.tacc.utexas.edu/pete0100-1/download/b8fabe70-9639-4b3f-a2e2-bd9e854237de > ~/Downloads/image1.png

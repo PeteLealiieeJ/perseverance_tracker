@@ -237,6 +237,8 @@ def sol_req():
     """
     Find recentcy of data set (most recent sol date)
     """
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
     allSol = ser_by_waykeys('sol')
     return f'Most recent data waypoint is at Sol-{max(allSol)}\n'
 
@@ -246,6 +248,8 @@ def orientation_req():
     """
     filters for and presents all orientation data
     """
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
     return jsonify( dlist_by_waykeys(['sol','yaw_rad','pitch','roll']) )
 
 
@@ -311,6 +315,8 @@ def position_req():
     """
     filters for and presents all positioning data
     """
+    if(len(rdw.keys())==0):
+        return 'Please use /load with POST route \n'
     return jsonify( dlist_by_waykeys(['sol','lon','lat']) )
 
 

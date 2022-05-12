@@ -1,6 +1,3 @@
-# STATUS: IN PROGRESS
-####################################################################################################
-
 # FLASKS LIBRARIES
 from flask import Flask, request, jsonify, send_file
 #LIBRARY USED TO PULL JSON FROM NASA SOURCE

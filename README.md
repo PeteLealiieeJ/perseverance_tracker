@@ -133,7 +133,7 @@ NOTE: One must also update the FPORT, BASEROUTE, REDIS_TEST_IP and REDIS_TEST_PO
 
     #returns the redis ip address
 
-The IP address you get from the above command must then be copy and pasted into the test_db.py variable, **REDIS_TEST_IP** (line 19). It only needs to be changed here because this variable is imported to the other test files when necessary. Assumming that you've run the containers locally without altering the dockerfile, the FPORT, BASEROUTE, and REDIS_TEST_PORT should be the same. If running on a different port, be sure to change the **FPORT** variable on line 5 of **test_flask.py**.
+The IP address you get from the above command must then be copy and pasted into the **test_db.py** variable, **REDIS_TEST_IP** (line 19). It only needs to be changed here because this variable is imported to the other test files when necessary. Assumming that you've run the containers locally without altering the dockerfile, the FPORT, BASEROUTE, and REDIS_TEST_PORT should be the same. If running on a different port, be sure to change the **FPORT** variable on line 14 of **test_db.py**.
 
 
 After that, one can run pytest with the following command in the test folder

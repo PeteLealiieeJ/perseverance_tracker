@@ -98,6 +98,9 @@ def add_job(datakeys, pltopt, start, end, status="submitted"):
 
 
 def decode_byte_dict(bdict):
+    """
+    decode byte dictionary from hgetall
+    """
     ddict = {}
     for key in bdict.keys():
         if not key.decode('utf-8') == 'image':

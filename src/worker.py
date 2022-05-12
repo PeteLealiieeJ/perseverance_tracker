@@ -5,7 +5,9 @@ import json
 
 
 def xyser_by_waykeys(xkey,ykey):
-    # RUN THROUGH KEYS AND APPEND TO DATA LIST
+    """
+    filter waypoint source with two keys
+    """
     if(len(rdw.keys())==0):
         return {}
     xset = []
@@ -19,7 +21,9 @@ def xyser_by_waykeys(xkey,ykey):
 
 
 def xyser_by_travkeys(xkey,ykey):
-    # RUN THROUGH KEYS AND APPEND TO DATA LIST
+    """
+    filter traverse source with two keys
+    """
     if(len(rdt.keys())==0):
         return {}
     xset = []
@@ -35,6 +39,9 @@ def xyser_by_travkeys(xkey,ykey):
 
 @q.worker
 def execute_plotting_jobs(jid):
+    """
+    worker for analysis and performing ploting jobs 
+    """
     update_job_status(jid, 'in progress')
     job = get_job_by_id(jid)
 

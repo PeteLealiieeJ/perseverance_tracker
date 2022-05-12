@@ -6,7 +6,7 @@ import json
 import sys, os
 from time import sleep
 from test_db import REDIS_TEST_IP, REDIS_TEST_PORT
-from test_flask_api import FPORT
+from test_db import FPORT
 
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)

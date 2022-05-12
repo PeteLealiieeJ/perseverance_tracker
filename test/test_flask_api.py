@@ -1,8 +1,8 @@
 # PYTEST NON-CONTAINERIZED REQUIREMENT
 import pytest, requests
 from typing import Type
+from test_db import FPORT
 
-FPORT = 5015
 BASEROUTE = f'http://localhost:{FPORT}'
 requests.post(f'{BASEROUTE}/load')
 

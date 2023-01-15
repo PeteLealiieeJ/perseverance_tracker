@@ -1,5 +1,5 @@
 #
-# Perseverance Tracker - Understanding the Martian Rover 
+# Perseverance Tracker - Understanding the Martian Rover (ARCHIVED AS OF JANUARY 2023)
 This repository contains an API which tracks the Perseverance rover's traversal across the Martian surface, and provides data which is useful for understanding the Perseverance Rovers performance and state during the duration of its time on Mars. This repository contains the components and instructions necessary to deploy this API in an Image (with Docker) and on Kubernetes so that the user can receive and visualize data from the rover with plots and responses from the API.
 
 Firstly, the source data used for this API comes from NASA and can be found in the two links below. (Note that the repo uses only the Waypoint dataset; However, the traversal dataset is also stored on the Redis volume for possible future use to make more accurate mapping plots)
